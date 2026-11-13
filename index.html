@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>wmCoinCoin — CoinCoin Clicker</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="app" id="app">
+  <div class="top">
+    <div class="dock" aria-hidden="true">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <span class="dock-icon">🦆</span>
+      <span class="dock-icon">🦪</span>
+      <span class="dock-icon">📟</span>
+      <span class="dock-icon">💾</span>
+    </div>
+    <span class="app-name" id="app-name">wmCoinCoin :: COINCOIN.EXE</span>
+    <span class="version" id="version-label">v0.1 · alpha textuelle</span>
+    <button class="top-button" id="save-game" type="button" aria-label="Sauvegarder la partie" title="Sauvegarder la partie dans le navigateur">💾</button>
+    <button class="top-button" id="load-game" type="button" aria-label="Recharger la sauvegarde" title="Recharger la dernière sauvegarde locale">📂</button>
+  </div>
+
+  <header class="heading">
+    <div class="kicker">LOGICIEL POUR DÉCIDEUR PRESSÉ · TRIBUNE LOCALE</div>
+    <h1>COINCOIN CLICKER <span class="duck-sign">\_o&lt;</span></h1>
+    <p>Il faut cultiver notre bouchot. La productivité est facultative.</p>
+    <div class="warnings">
+      <div class="warning" id="chauve-warning" hidden></div>
+      <div class="warning rebuild" id="rebuild-warning" hidden></div>
+    </div>
+    <div class="rebirth-box rebirth-top">
+      <div class="rebirth-head"><span>RECOMPILER LE BOUCHOT</span><b id="rebirth-sub">→ wmCoinCoin v1.0</b></div>
+      <div class="rebirth-track"><div id="rebirth-progress"></div></div>
+      <div id="rebirth-note">Encore 1 500 coins sur cette tribune.</div>
+      <button id="rebirth" type="button">↻ Recommencer une nouvelle tribune</button>
+      <div class="version-note" id="version-note">Fenêtre brute. Aucune fioriture, comme en 2001.</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="left">
+      <div class="stats">
+        <div class="total" id="coins">0</div>
+        <div class="total-label">COINCOINS DISPONIBLES</div>
+        <div class="mini">
+          <div><b id="cps">0/s</b>production</div>
+          <div><b id="power">1</b>par clic</div>
+          <div><b id="clicks">0</b>clics</div>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="stage-label">LE GROS BOUTON ROUGE™</div>
+        <button class="duck" id="duck" hidden type="button">🦆 CANARD !</button>
+        <button class="dog" id="dog" hidden type="button">🐕 TOUTOU !</button>
+        <div class="base">
+          <button class="red" id="button" type="button" aria-label="Faire coin coin : \_o&lt;">\_o&lt;</button>
+        </div>
+        <div class="stage-hint">APPUYER POUR MOULER · chaque clic est important*</div>
+      </div>
+
+      <div class="meter-head">
+        <span>🩲 État du slip</span>
+        <span class="meter-actions">
+          <b id="slip-label">100 % · PROPRE · ×1,50</b>
+          <button class="chip on" id="slip-toggle" type="button" aria-pressed="true" title="Le slip multiplie les coincoins (×1,50 à 100 %). Cliquer pour désactiver.">×1,50</button>
+        </span>
+      </div>
+      <div class="meter" role="progressbar" aria-label="État du slip" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="fill" id="slip-meter" style="width:100%"></div></div>
+      <div class="meter-head"><span>🔥 Troll-o-mètre</span><b id="troll-label">0 %</b></div>
+      <div class="meter" role="progressbar" aria-label="Troll-o-mètre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill troll" id="troll-meter"></div></div>
+
+      <div class="troll-scope" id="troll-scope" aria-label="Troll-o-scope, modèle couleur multiprecision 55x21">
+        <span class="scope-label">TROLL-O-SCOPE 55×21</span>
+        <div class="scope-bars" id="scope-bars"></div>
+      </div>
+
+      <div class="section"><span>▸ PALMIPÈDE</span><span id="posted-count">0 / 16</span></div>
+      <div class="palmipede panel">
+        <div class="url-line">
+          <span class="url-dot">🔗</span>
+          <div class="url-text">
+            <b id="url-label">linuxfr.org</b>
+            <code id="url-value">https://linuxfr.org/</code>
+          </div>
+          <button class="mini" id="url-shuffle" type="button" title="Tirer une autre URL">↻</button>
+        </div>
+        <div class="url-actions">
+          <span class="url-flag" id="url-status">inédite — PREUMS possible</span>
+          <button class="post" id="url-post" type="button">POSTER</button>
+        </div>
+        <div class="bloub-line">BLOUB-O-MÈTRE : <b id="bloub-count">0</b> · une URL déjà postée fait « bloub »</div>
+      </div>
+
+      <div class="section"><span>▸ PINNIPÈDE TÉLÉSCRIPTEUR</span><span>● LIVE (FAUX)</span></div>
+      <div class="feed" id="feed" role="log" aria-label="Fausse tribune"></div>
+
+      <div class="section"><span>▸ HAUTS FAITS INUTILES</span><span id="achievement-count">0 / 22</span></div>
+      <div class="achievements" id="achievements">
+        <span class="empty">Le premier clic est le plus difficile.</span>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="shop-head">
+        <span>FRITURES À INSTALLER</span>
+        <span class="tag">APT-GET COINCOIN</span>
+      </div>
+      <div class="shop" id="shop"></div>
+      <div class="shop-hint" id="shop-hint"></div>
+      <details class="owned-box" id="owned-box" hidden>
+        <summary>
+          <span>Fritures possédées (<b id="owned-count">0</b>)</span>
+          <span class="owned-hint">acheter plus</span>
+        </summary>
+        <div class="shop owned-shop" id="owned-shop"></div>
+      </details>
+
+      <div class="section"><span>▸ MAINTENANCE &amp; GOODIES</span><span>root@bouchot</span></div>
+      <div class="tools" id="tools"></div>
+
+      <div class="section"><span>▸ FORTUNES &amp; GOODIES DE COLLECTION</span><span id="fortune-count">0 / 308</span></div>
+      <div class="albums" id="albums"></div>
+      <div class="latest-fortune" id="latest-fortune"></div>
+      <p class="source-note" id="fortune-note">Fortunes historiques : @informatique, @multidesk, @tribune-linuxfr.</p>
+
+      <div class="section"><span>▸ COLLECTION DE TOTOZ</span><span id="toto-count">0 / 14</span></div>
+      <div class="gallery" id="gallery"></div>
+      <p class="source-note">Les images totoz se chargent depuis <a href="https://totoz.eu/" target="_blank" rel="noopener">totoz.eu</a> quand la connexion le permet. Le jeu fonctionne hors ligne.</p>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-stats">
+      <span>Total moisi : <b id="lifetime">0</b></span>
+      <span>XP de moule : <b id="xp">0</b> <span id="xp-mult">×1.00 XP</span></span>
+      <span>Sauvegarde : <b id="last-save">jamais</b></span>
+    </div>
+    <div class="footer-bottom">
+      <span id="status">● sauvegarde locale · simulation hors ligne · rien de tout ceci n'est connecté à votre vraie tribune</span>
+      <span class="diodes" id="diodes" aria-hidden="true"><i class="g"></i><i class="a"></i><i class="r"></i></span>
+      <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true">🔊 son</button>
+    </div>
+  </footer>
+</main>
+
+<div class="notice" id="notice" hidden role="status"></div>
+
+<noscript><p style="color:#fff;text-align:center">Ce bouchot a besoin de JavaScript. Même gcoincoin en a besoin, c'est dire.</p></noscript>
+
+<script src="js/fortunes.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
