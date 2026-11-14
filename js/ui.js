@@ -36,8 +36,10 @@
         'rebirth-sub', 'rebirth-progress', 'rebirth-note', 'lifetime',
         'xp', 'xp-mult', 'sound-toggle', 'status', 'notice', 'diodes',
         'version-note', 'fortune-count', 'fortune-note', 'last-save',
+        'wtm-stats', 'wtm-post', 'wtm-choices', 'wtm-feedback', 'wtm-next',
       ];
       for (const id of ids) this.refs[id] = $(id);
+      this.refs['achievement-count'].textContent = '0 / ' + CC.ACHIEVEMENTS.length;
       this.refs.slipMeter = this.refs['slip-meter'];
       this.refs.trollMeter = this.refs['troll-meter'];
 
@@ -336,13 +338,60 @@
       }
     },
 
+    renderWtm() {
+      const s = S().s;
+      const stats = this.refs['wtm-stats'];
+      const post = this.refs['wtm-post'];
+      const choices = this.refs['wtm-choices'];
+      const feedback = this.refs['wtm-feedback'];
+      const next = this.refs['wtm-next'];
+      stats.textContent = s.wtmWins + ' V · ' + s.wtmLosses + ' D · série ' + s.wtmStreak;
+      choices.replaceChildren();
+      const wtm = E().wtm;
+      if (!wtm) {
+        post.textContent = 'Aucun post à deviner pour le moment.';
+        feedback.textContent = '';
+        feedback.className = 'wtm-feedback';
+        next.disabled = true;
+        return;
+      }
+      post.textContent = wtm.fortune.t;
+      const source = CC.SOURCES[wtm.fortune.s] || { label: wtm.fortune.s };
+      for (const choice of wtm.choices) {
+        const button = el('button', 'wtm-choice', choice);
+        button.type = 'button';
+        button.dataset.wtmChoice = choice;
+        if (wtm.answered) {
+          if (choice === wtm.correct) button.classList.add('correct');
+          else if (choice === wtm.selected) button.classList.add('wrong');
+          button.disabled = true;
+        }
+        choices.append(button);
+      }
+      if (wtm.answered) {
+        if (wtm.selected === wtm.correct) {
+          feedback.textContent = 'Bien vu : c’était ' + wtm.correct +
+            ' · +' + S().fmt(wtm.reward) + ' coins · ' + source.label;
+          feedback.className = 'wtm-feedback good';
+        } else {
+          feedback.textContent = 'Raté : c’était ' + wtm.correct + ' · ' + source.label;
+          feedback.className = 'wtm-feedback bad';
+        }
+        next.disabled = false;
+      } else {
+        feedback.textContent = 'Auteur masqué · 4 moules possibles';
+        feedback.className = 'wtm-feedback';
+        next.disabled = true;
+      }
+    },
+
     updateUrl() {
       const s = S().s;
       const entry = s.currentUrl;
       if (!entry) return;
       const posted = s.urlsPosted.includes(entry.url);
       const antibloub = S().versionIndex() >= 8;
-      this.refs['url-label'].textContent = entry.label;
+      this.refs['url-label'].textContent = (s.goodies.https ? '🔒 ' : '') + entry.label;
       this.refs['url-value'].textContent = entry.url;
       if (posted && antibloub) {
         this.refs['url-status'].textContent =
@@ -511,6 +560,7 @@
       this.buildGallery();
       this.buildAchievements();
       this.updateUrl();
+      this.renderWtm();
       this.render();
     },
   };

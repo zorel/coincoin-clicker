@@ -3,7 +3,7 @@
   'use strict';
 
   const KEY = 'coincoin-clicker-local-v2';
-  const SAVE_SCHEMA = 2;
+  const SAVE_SCHEMA = 3;
   const MAX_OFFLINE = 8 * 3600;
 
   const nf = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
@@ -58,8 +58,83 @@
       nextBotUrl: 0,
       lastPreums: '',
       lastSave: 0,
+      wtmWins: 0,
+      wtmLosses: 0,
+      wtmStreak: 0,
+      wtmBest: 0,
       settings: { sound: true, slipImpact: true },
     };
+  }
+
+  function normalizeSave(data) {
+    const fresh = defaults();
+    const base = defaults();
+    for (const key of Object.keys(base)) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) base[key] = data[key];
+    }
+    base.schema = SAVE_SCHEMA;
+
+    base.owned = {};
+    for (const b of CC.BUILDINGS) {
+      const n = Number(data.owned && data.owned[b.id]);
+      base.owned[b.id] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+    }
+
+    base.goodies = {};
+    for (const g of CC.GOODIES) {
+      if (data.goodies && data.goodies[g.id]) base.goodies[g.id] = true;
+    }
+
+    base.settings = {
+      sound: !data.settings || data.settings.sound !== false,
+      slipImpact: !data.settings || data.settings.slipImpact !== false,
+    };
+
+    const numeric = [
+      'coins', 'runTotal', 'lifetime', 'clicks', 'powerLevel', 'slip', 'xp',
+      'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
+      'gcoincoinClicks', 'trolls', 'troll', 'frenzyUntil', 'chauveUntil',
+      'rebuildUntil', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
+      'duckUntil', 'nextDog', 'dogUntil', 'nextChauve', 'nextBotUrl',
+      'lastSave', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
+    ];
+    for (const key of numeric) {
+      const n = Number(base[key]);
+      base[key] = Number.isFinite(n) ? n : fresh[key];
+    }
+
+    base.slip = Math.max(0, Math.min(100, base.slip));
+    for (const key of [
+      'clicks', 'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
+      'gcoincoinClicks', 'trolls', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
+    ]) {
+      base[key] = Math.max(0, Math.floor(base[key] || 0));
+    }
+    base.wtmBest = Math.max(base.wtmBest, base.wtmStreak);
+
+    for (const key of ['totoz', 'fortunes', 'achievements', 'urlsPosted', 'seenBuildings']) {
+      base[key] = Array.isArray(data[key])
+        ? data[key].filter((v) => typeof v === 'string')
+        : [];
+    }
+
+    const knownBuildings = new Set(CC.BUILDINGS.map((b) => b.id));
+    const seen = new Set(base.seenBuildings.filter((id) => knownBuildings.has(id)));
+    seen.add('moule');
+    for (const b of CC.BUILDINGS) if (base.owned[b.id] > 0) seen.add(b.id);
+    base.seenBuildings = [...seen];
+
+    if (data.currentUrl && typeof data.currentUrl.url === 'string') {
+      base.currentUrl = {
+        url: data.currentUrl.url,
+        label: typeof data.currentUrl.label === 'string' ? data.currentUrl.label : data.currentUrl.url,
+      };
+    } else {
+      base.currentUrl = null;
+    }
+    if (typeof data.lastPreums !== 'string') base.lastPreums = '';
+
+    return base;
   }
 
   const State = {
@@ -190,6 +265,7 @@
       let mult = 1;
       if (this.s.goodies.pycoincoin) mult += 0.05;
       if (this.s.goodies.quteqoin) mult += 0.08;
+      if (this.s.goodies.rails) mult += 0.12;
       if (this.s.goodies.pull) mult += 0.10;
       if (this.s.goodies.mug) mult += 0.10;
       if (this.s.goodies.sticker) mult += 0.15;
@@ -289,6 +365,10 @@
         chauveEvents: this.s.chauveEvents,
         gcoincoinClicks: this.s.gcoincoinClicks,
         trolls: this.s.trolls,
+        wtmWins: this.s.wtmWins,
+        wtmLosses: this.s.wtmLosses,
+        wtmStreak: this.s.wtmStreak,
+        wtmBest: this.s.wtmBest,
         lastPreums: this.s.lastPreums,
         settings: this.s.settings,
       };
@@ -345,6 +425,33 @@
       }
     },
 
+    exportSave() {
+      return JSON.stringify({
+        game: 'coincoin-clicker',
+        schema: SAVE_SCHEMA,
+        exportedAt: new Date().toISOString(),
+        state: this.s,
+      }, null, 2);
+    },
+
+    importSave(raw) {
+      let data;
+      try {
+        data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      } catch (err) {
+        return { ok: false, error: 'JSON invalide.' };
+      }
+      if (data && data.state && typeof data.state === 'object') data = data.state;
+      if (!data || typeof data.coins !== 'number' || !Number.isFinite(data.coins)) {
+        return { ok: false, error: 'Ce fichier ne contient pas une sauvegarde CoinCoin valide.' };
+      }
+      this.s = normalizeSave(data);
+      this.s.lastSave = Date.now();
+      this.schedule();
+      if (!this.s.currentUrl) this.s.currentUrl = this.randomUrl();
+      return { ok: true };
+    },
+
     load() {
       this.offline = null;
       let data = null;
@@ -356,21 +463,10 @@
       }
       const fresh = defaults();
       if (data && typeof data.coins === 'number') {
-        const merged = Object.assign(fresh, data);
-        delete merged.costCurve;
-        merged.schema = SAVE_SCHEMA;
-        merged.owned = Object.assign(zeroOwned(), data.owned || {});
-        merged.goodies = data.goodies || {};
-        merged.settings = Object.assign({ sound: true, slipImpact: true }, data.settings || {});
-        for (const key of ['totoz', 'fortunes', 'achievements', 'urlsPosted', 'seenBuildings']) {
-          if (!Array.isArray(merged[key])) merged[key] = [];
-        }
-        this.s = merged;
-        const seen = new Set(this.s.seenBuildings);
-        seen.add('moule');
-        for (const b of CC.BUILDINGS) if (this.owned(b.id) > 0) seen.add(b.id);
-        this.s.seenBuildings = [...seen];
-        const elapsed = Math.min(MAX_OFFLINE, Math.max(0, (Date.now() - (data.lastSave || Date.now())) / 1000));
+        this.s = normalizeSave(data);
+        const savedAt = Number(data.lastSave);
+        const lastSeen = Number.isFinite(savedAt) && savedAt > 0 ? savedAt : Date.now();
+        const elapsed = Math.min(MAX_OFFLINE, Math.max(0, (Date.now() - lastSeen) / 1000));
         const rate = this.cps();
         const earned = rate * elapsed * 0.5;
         if (earned > 1) {

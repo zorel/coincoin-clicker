@@ -11,6 +11,20 @@
     return list[Math.floor(Math.random() * list.length)];
   }
 
+  function shuffle(list) {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  }
+
+  function shortWtmAuthor(value) {
+    let author = String(value).split(' - ')[0].replace(/\s+/g, ' ').trim();
+    if (author.length > 34) author = author.slice(0, 33).trim() + '…';
+    return author;
+  }
+
   const Engine = {
     lastTick: now(),
     lastSave: now(),
@@ -18,12 +32,15 @@
     duckShown: false,
     dogShown: false,
     started: false,
+    wtm: null,
+    nextBlower: 0,
 
     init() {
       const offline = S().load();
       const s = S().s;
       if (!s.nextGlitch) S().schedule();
       if (!s.currentUrl) s.currentUrl = S().randomUrl();
+      this.nextBlower = now() + rand(25000, 50000);
       this.bindVisibility();
       if (offline) {
         U().log(
@@ -37,6 +54,7 @@
       U().log('Bienvenue sur le bouchot. Appuyez sur le gros bouton rouge.', 'system');
       U().log('[:totoz] prêt pour le moulage. gcoincoin, lui, toujours pas.', '', 'moule<');
       this.revealBuildings();
+      this.newWtmRound();
       U().refreshStatic();
       U().render();
       this.start();
@@ -49,25 +67,31 @@
       setInterval(() => this.tick(), 200);
     },
 
-    reloadState() {
-      if (!S().hasSave()) {
-        U().notice('Aucune sauvegarde locale à recharger.');
-        return false;
-      }
-      const offline = S().load();
+    applyState() {
       const s = S().s;
       if (!s.nextGlitch) S().schedule();
       if (!s.currentUrl) s.currentUrl = S().randomUrl();
       this.lastTick = now();
       this.lastCheck = now();
+      this.nextBlower = now() + rand(25000, 50000);
       this.duckShown = !!(s.duckUntil && now() < s.duckUntil);
       this.dogShown = !!(s.dogUntil && now() < s.dogUntil);
       U().showDuck(this.duckShown);
       U().showDog(this.dogShown);
       U().setVersion();
       this.revealBuildings();
+      this.newWtmRound();
       U().refreshStatic();
       U().render();
+    },
+
+    reloadState() {
+      if (!S().hasSave()) {
+        U().notice('Aucune sauvegarde locale à recharger.');
+        return false;
+      }
+      const offline = S().load();
+      this.applyState();
       U().log('État rechargé depuis la sauvegarde locale.', 'system', 'wmCoinCoin<');
       U().notice('📂 Sauvegarde rechargée');
       if (offline) {
@@ -78,6 +102,98 @@
         );
       }
       return true;
+    },
+
+    importState(raw) {
+      const result = S().importSave(raw);
+      if (!result.ok) {
+        U().log('Import impossible : ' + result.error, 'danger', 'wmCoinCoin<');
+        U().notice('❌ ' + result.error);
+        return false;
+      }
+      this.applyState();
+      S().save();
+      U().log('Sauvegarde importée depuis un fichier JSON.', 'system', 'wmCoinCoin<');
+      U().notice('📥 Sauvegarde importée');
+      return true;
+    },
+
+    newWtmRound() {
+      const pool = (window.FORTUNES || []).filter(
+        (f) => f.a && f.t.length >= 30 && f.t.length <= 500
+      );
+      if (!pool.length) {
+        this.wtm = null;
+        U().renderWtm();
+        return null;
+      }
+      const fortune = pick(pool);
+      const correct = shortWtmAuthor(fortune.a) || 'moule anonyme';
+      const names = [...new Set(
+        pool.map((f) => shortWtmAuthor(f.a)).filter((name) => name && name !== correct)
+      )];
+      const choices = [correct];
+      while (choices.length < 4 && names.length) {
+        const index = Math.floor(Math.random() * names.length);
+        const name = names.splice(index, 1)[0];
+        if (!choices.includes(name)) choices.push(name);
+      }
+      for (const name of CC.WTM_FALLBACK) {
+        if (choices.length >= 4) break;
+        if (name && !choices.includes(name)) choices.push(name);
+      }
+      this.wtm = {
+        fortune,
+        correct,
+        choices: shuffle(choices.slice()),
+        answered: false,
+        selected: null,
+        reward: 0,
+      };
+      U().renderWtm();
+      return this.wtm;
+    },
+
+    answerWtm(choice) {
+      const wtm = this.wtm;
+      if (!wtm || wtm.answered) return;
+      wtm.answered = true;
+      wtm.selected = choice;
+      const s = S().s;
+      if (choice === wtm.correct) {
+        s.wtmWins += 1;
+        s.wtmStreak += 1;
+        s.wtmBest = Math.max(s.wtmBest, s.wtmStreak);
+        const bonus = Math.max(25, Math.floor(S().cps() * 10));
+        wtm.reward = bonus;
+        this.gain(bonus);
+        U().log(
+          'WhatTheMoule : bien vu, c’était ' + wtm.correct +
+          '. +' + S().fmt(bonus) + ' coins. Série ' + s.wtmStreak + '.',
+          'system', 'wtm<'
+        );
+        U().notice('🕵️ Bonne moule ! +' + S().fmt(bonus) + ' coins');
+      } else {
+        s.wtmLosses += 1;
+        s.wtmStreak = 0;
+        S().addSlip(s.goodies.https ? -1 : -2);
+        U().log(
+          'WhatTheMoule : raté, c’était ' + wtm.correct + '. −' +
+          (s.goodies.https ? '1' : '2') + ' % de slip.',
+          'danger', 'wtm<'
+        );
+        U().notice('🕵️ Raté ! C’était ' + wtm.correct);
+      }
+      this.progress();
+      U().renderWtm();
+      U().render();
+      S().save();
+    },
+
+    wtmNext() {
+      this.newWtmRound();
+      U().renderWtm();
+      U().render();
     },
 
     bindVisibility() {
@@ -170,6 +286,13 @@
         ' (+' + S().fmtRate(b.cps) + ')', 'system', 'apt<'
       );
       if (s.owned[b.id] === 1) U().notice(b.icon + ' ' + b.name + ' opérationnel !');
+      if (b.id === 'souffleuse') {
+        if (CC.Audio && CC.Audio.blower) CC.Audio.blower();
+        U().notice('🍂 BRRRR ! La souffleuse à feuilles est en marche.');
+      }
+      if (b.id === 'table-volante') {
+        U().notice('🪑 La table volante décolle. Personne ne sait pourquoi.');
+      }
       this.progress();
       U().refreshStatic();
       U().render();
@@ -288,7 +411,7 @@
       if (s.urlsPosted.includes(entry.url)) {
         s.bloubs += 1;
         s.troll = Math.min(100, s.troll + 12);
-        S().addSlip(-2);
+        S().addSlip(s.goodies.https ? -1 : -2);
         U().log('BLOUB ! « ' + entry.label + ' » avait déjà été postée. Le bouchot fait des bulles.', 'danger', 'vous<');
         U().notice('💦 BLOUB… URL déjà postée');
         U().bubble();
@@ -418,6 +541,7 @@
       }
       let damage = rand(15, 30);
       if (s.goodies.kevlar) damage /= 2;
+      if (s.goodies.https) damage /= 2;
       S().addSlip(-damage);
       U().log('SLIP SALE : ' + error + ' · −' + Math.round(damage) + ' %', 'danger', 'parser<');
       if (s.slip <= 0) U().notice('🩲 SLIP TROUÉ ! Production ralentie. Reprisez.');
@@ -471,6 +595,19 @@
       }
       if (t >= s.nextChauve) this.chauveEvent();
       if (t >= s.nextBotUrl) this.botUrl();
+
+      if (S().owned('souffleuse') > 0) {
+        if (!this.nextBlower) this.nextBlower = t + rand(25000, 50000);
+        if (t >= this.nextBlower) {
+          this.nextBlower = t + rand(45000, 90000);
+          if (s.settings.sound) {
+            CC.Audio.blower();
+            U().log('BRRRR ! La souffleuse à feuilles se met en route. Les feuilles volent.', '', 'souffleuse<');
+          }
+        }
+      } else {
+        this.nextBlower = t + 30000;
+      }
 
       if (s.rebuildUntil && t >= s.rebuildUntil) {
         s.rebuildUntil = 0;

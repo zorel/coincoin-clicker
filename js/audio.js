@@ -51,6 +51,34 @@
       this.tone(180, 880, 0.12, 'square', 0.045);
       setTimeout(() => this.tone(900, 160, 0.18, 'square', 0.035), 110);
     },
+
+    blower() {
+      if (!this.enabled()) return;
+      this.init();
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const duration = 1.1;
+      const t0 = ctx.currentTime;
+      const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i += 1) {
+        const wobble = 0.55 + 0.45 * Math.sin((i / ctx.sampleRate) * 37);
+        data[i] = (Math.random() * 2 - 1) * wobble;
+      }
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1100, t0);
+      filter.frequency.exponentialRampToValueAtTime(240, t0 + duration);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.045, t0 + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      source.connect(filter).connect(gain).connect(ctx.destination);
+      source.start(t0);
+      source.stop(t0 + duration + 0.02);
+    },
   };
 
   CC.Audio = Audio;

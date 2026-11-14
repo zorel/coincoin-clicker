@@ -28,6 +28,12 @@
     document.getElementById('url-post').addEventListener('click', () => Engine.postUrl());
     document.getElementById('url-shuffle').addEventListener('click', () => Engine.shuffleUrl());
 
+    document.getElementById('wtm-choices').addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-wtm-choice]');
+      if (button) Engine.answerWtm(button.dataset.wtmChoice);
+    });
+    document.getElementById('wtm-next').addEventListener('click', () => Engine.wtmNext());
+
     document.getElementById('rebirth').addEventListener('click', () => {
       const state = CC.State;
       const next = state.nextVersion();
@@ -77,6 +83,38 @@
       const message = 'Recharger la dernière sauvegarde locale ?\n\nLa progression non sauvegardée sera perdue.';
       if (!window.confirm(message)) return;
       CC.Engine.reloadState();
+    });
+
+    document.getElementById('export-game').addEventListener('click', () => {
+      const stamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
+      const blob = new Blob([CC.State.exportSave()], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'coincoin-clicker-save-' + stamp + '.json';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      UI.log('Sauvegarde exportée dans un fichier JSON.', 'system', 'wmCoinCoin<');
+      UI.notice('📤 Sauvegarde exportée');
+    });
+
+    const importInput = document.getElementById('import-file');
+    document.getElementById('import-game').addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', () => {
+      const file = importInput.files && importInput.files[0];
+      importInput.value = '';
+      if (!file) return;
+      if (file.size > 2000000) {
+        UI.notice('Fichier trop gros pour une sauvegarde CoinCoin.');
+        return;
+      }
+      const message = 'Importer « ' + file.name + ' » ?\n\nL’état actuel sera remplacé.';
+      if (!window.confirm(message)) return;
+      file.text()
+        .then((text) => CC.Engine.importState(text))
+        .catch(() => UI.notice('Impossible de lire ce fichier.'));
     });
 
     document.getElementById('slip-toggle').addEventListener('click', () => {

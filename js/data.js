@@ -27,8 +27,8 @@
   ];
 
   // Prices and base CPS are derived from Cookie Clicker's own balance curves
-  // (main.js v2.058): first 12 buildings, basePrice/baseCps formulas.
-  // Copy price increase is 1.15, like Cookie Clicker.
+  // (main.js v2.058): first 13 real tiers (Cursor → Antimatter Condenser),
+  // plus the gcoincoin phantom. Copy price increase is 1.15.
   // CPS values are halved on top, as requested.
   CC.BUILDINGS = [
     {
@@ -79,6 +79,14 @@
       desc: 'Le créateur de la tribune aime les chiens. Beaucoup. Trop ?',
     },
     {
+      id: 'souffleuse', icon: '🍂', name: 'Souffleuse à feuilles', cost: 14000000000000, cps: 32500000,
+      desc: 'Ça fait du bruit. Les feuilles et les moules décollent.',
+    },
+    {
+      id: 'table-volante', icon: '🪑', name: 'Table volante', cost: 170000000000000, cps: 215000000,
+      desc: 'Une table qui vole. On ne pose rien dessus, surtout pas le backend.',
+    },
+    {
       id: 'gcoincoin', icon: '💾', name: 'gcoincoin 0.1', cost: Infinity, cps: 0,
       desc: 'Annoncé. Maintenant. Depuis 2003. Toujours pas sorti.',
       phantom: true, unlockAt: 6000000,
@@ -121,6 +129,16 @@
       id: 'quteqoin', icon: '🐧', name: 'quteqoin', cost: () => 25000,
       desc: () => '+8 % de production. Une interface Qt pour mouler avec classe.',
       available: (s) => !s.goodies.quteqoin,
+    },
+    {
+      id: 'rails', icon: '💎', name: 'LinuxFR en Ruby on Rails', cost: () => 250000,
+      desc: () => '+12 % de production. Migrations, ORM, assets : la tribune est moderne.',
+      available: (s) => !s.goodies.rails,
+    },
+    {
+      id: 'https', icon: '🔒', name: 'HTTPS sur la tribune', cost: () => 400000,
+      desc: () => 'Cadenas vert : dégâts de slip ÷2 et bloub moins douloureux.',
+      available: (s) => !s.goodies.https,
     },
     {
       id: 'pull', icon: '👕', name: 'Pull « Je bande pour Emacs »', cost: () => 12000,
@@ -214,7 +232,14 @@
     { who: 'root<', text: 'Ne relancez pas make. Sérieusement.' },
     { who: 'moule<', text: 'Quelqu’un a un miroir pour gcoincoin ?' },
     { who: 'troll<', text: 'Windows, ça plante. Linux, ça compile. Balances.' },
+    { who: 'root<', text: 'LinuxFR est passé sous Rails. Les migrations sont dans le slip.' },
+    { who: 'pinnipède<', text: 'HTTPS activé : le cadenas est vert, le slip est sauvé.' },
+    { who: 'souffleuse<', text: 'BRRRRRR… (la souffleuse à feuilles est en marche)' },
+    { who: 'table-volante<', text: 'La table vole. Elle ne rendra pas le backend.' },
+    { who: 'wtm<', text: 'Qui a posté ça ? L’auteur est masqué.' },
   ];
+
+  CC.WTM_FALLBACK = ['moule_du_fond', 'root', 'troll', 'le_chauve', 'DaPlopBot', 'Alice'];
 
   CC.DOG_LINES = [
     'Le toutou de Fabien Poutrelle remue la queue. +%N coins.',
@@ -287,6 +312,13 @@
     { id: 'troll-ten', icon: '🔥', name: 'Troll-o-scope certifié', check: (s) => s.trolls >= 10 },
     { id: 'totoz-all', icon: '🖼️', name: 'Collectionneur de totoz', check: (s) => s.totoz.length >= CC.TOTOZ.length },
     { id: 'slip-zero', icon: '🩲', name: 'Slip troué', check: (s) => s.slip <= 0 },
+    { id: 'rails', icon: '💎', name: 'Rails migration', check: (s) => !!s.goodies.rails },
+    { id: 'https', icon: '🔒', name: 'Cadenas vert', check: (s) => !!s.goodies.https },
+    { id: 'souffleuse', icon: '🍂', name: 'BRRRR', check: (s) => (s.owned.souffleuse || 0) > 0 },
+    { id: 'table-volante', icon: '🪑', name: 'Meuble volant', check: (s) => (s.owned['table-volante'] || 0) > 0 },
+    { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', check: (s) => (s.wtmWins || 0) >= 1 },
+    { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', check: (s) => (s.wtmWins || 0) >= 10 },
+    { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', check: (s) => (s.wtmBest || 0) >= 5 },
   ];
 
   CC.FORTUNE_TIERS = {};

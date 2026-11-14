@@ -18,8 +18,13 @@
     </div>
     <span class="app-name" id="app-name">wmCoinCoin :: COINCOIN.EXE</span>
     <span class="version" id="version-label">v0.1 · alpha textuelle</span>
-    <button class="top-button" id="save-game" type="button" aria-label="Sauvegarder la partie" title="Sauvegarder la partie dans le navigateur">💾</button>
-    <button class="top-button" id="load-game" type="button" aria-label="Recharger la sauvegarde" title="Recharger la dernière sauvegarde locale">📂</button>
+    <span class="top-actions">
+      <button class="top-button" id="save-game" type="button" aria-label="Sauvegarder la partie" title="Sauvegarder la partie dans le navigateur">💾</button>
+      <button class="top-button" id="load-game" type="button" aria-label="Recharger la sauvegarde" title="Recharger la dernière sauvegarde locale">📂</button>
+      <button class="top-button" id="export-game" type="button" aria-label="Exporter la sauvegarde en JSON" title="Exporter la sauvegarde dans un fichier JSON">📤</button>
+      <button class="top-button" id="import-game" type="button" aria-label="Importer une sauvegarde JSON" title="Importer une sauvegarde depuis un fichier JSON">📥</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </span>
   </div>
 
   <header class="heading">
@@ -94,10 +99,21 @@
         <div class="bloub-line">BLOUB-O-MÈTRE : <b id="bloub-count">0</b> · une URL déjà postée fait « bloub »</div>
       </div>
 
+      <div class="section"><span>▸ WHATTHEMOULE</span><span id="wtm-stats">0 V · 0 D · série 0</span></div>
+      <div class="wtm panel">
+        <p class="wtm-prompt">Qui a posté ça ? L’auteur est masqué, à toi de deviner la moule.</p>
+        <blockquote class="wtm-post" id="wtm-post"></blockquote>
+        <div class="wtm-choices" id="wtm-choices"></div>
+        <div class="wtm-foot">
+          <span class="wtm-feedback" id="wtm-feedback" aria-live="polite"></span>
+          <button class="post" id="wtm-next" type="button" disabled>Autre post</button>
+        </div>
+      </div>
+
       <div class="section"><span>▸ PINNIPÈDE TÉLÉSCRIPTEUR</span><span>● LIVE (FAUX)</span></div>
       <div class="feed" id="feed" role="log" aria-label="Fausse tribune"></div>
 
-      <div class="section"><span>▸ HAUTS FAITS INUTILES</span><span id="achievement-count">0 / 22</span></div>
+      <div class="section"><span>▸ HAUTS FAITS INUTILES</span><span id="achievement-count">0 / 29</span></div>
       <div class="achievements" id="achievements">
         <span class="empty">Le premier clic est le plus difficile.</span>
       </div>
