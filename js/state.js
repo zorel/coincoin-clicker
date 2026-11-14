@@ -45,6 +45,10 @@
       frenzyUntil: 0,
       chauveUntil: 0,
       rebuildUntil: 0,
+      firstJeudiUntil: 0,
+      firstJeudiFactor: 2,
+      firstJeudiEvents: 0,
+      nextFirstJeudi: 0,
       urlsPosted: [],
       currentUrl: null,
       nextGlitch: 0,
@@ -95,7 +99,8 @@
       'coins', 'runTotal', 'lifetime', 'clicks', 'powerLevel', 'slip', 'xp',
       'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
       'gcoincoinClicks', 'trolls', 'troll', 'frenzyUntil', 'chauveUntil',
-      'rebuildUntil', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
+      'rebuildUntil', 'firstJeudiUntil', 'firstJeudiFactor', 'firstJeudiEvents',
+      'nextFirstJeudi', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
       'duckUntil', 'nextDog', 'dogUntil', 'nextChauve', 'nextBotUrl',
       'lastSave', 'pycoincoinLevel', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
     ];
@@ -108,10 +113,12 @@
     for (const key of [
       'clicks', 'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
       'gcoincoinClicks', 'trolls', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
+      'firstJeudiEvents',
     ]) {
       base[key] = Math.max(0, Math.floor(base[key] || 0));
     }
     base.wtmBest = Math.max(base.wtmBest, base.wtmStreak);
+    base.firstJeudiFactor = base.firstJeudiFactor === 3 ? 3 : 2;
 
     const pyVersions = CC.PYCOINCOIN_VERSIONS.length;
     let pyLevel = Math.max(0, Math.min(pyVersions, Math.floor(base.pycoincoinLevel || 0)));
@@ -305,7 +312,16 @@
     },
 
     boost() {
-      return this.frenzyActive() ? 3 : 1;
+      let mult = 1;
+      if (this.frenzyActive()) mult *= 3;
+      if (this.firstJeudiActive()) {
+        mult *= this.s.firstJeudiFactor === 3 ? 3 : 2;
+      }
+      return mult;
+    },
+
+    firstJeudiActive() {
+      return Date.now() < this.s.firstJeudiUntil;
     },
 
     chauveActive() {
@@ -385,6 +401,7 @@
         wtmLosses: this.s.wtmLosses,
         wtmStreak: this.s.wtmStreak,
         wtmBest: this.s.wtmBest,
+        firstJeudiEvents: this.s.firstJeudiEvents,
         lastPreums: this.s.lastPreums,
         settings: this.s.settings,
       };

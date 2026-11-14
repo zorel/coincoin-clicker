@@ -70,6 +70,35 @@
       }
     },
 
+    crowd() {
+      if (!this.enabled()) return;
+      this.init();
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const duration = 1.6;
+      const t0 = ctx.currentTime;
+      const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i += 1) {
+        const time = i / ctx.sampleRate;
+        const voices = 0.6 + 0.4 * Math.sin(time * 23) + 0.15 * Math.sin(time * 71);
+        data[i] = (Math.random() * 2 - 1) * voices;
+      }
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(850, t0);
+      filter.Q.setValueAtTime(0.7, t0);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.055, t0 + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      source.connect(filter).connect(gain).connect(ctx.destination);
+      source.start(t0);
+      source.stop(t0 + duration + 0.02);
+    },
+
     blower() {
       if (!this.enabled()) return;
       this.init();

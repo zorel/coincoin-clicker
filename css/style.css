@@ -101,6 +101,7 @@ code { font: inherit; }
   font-weight: 700;
 }
 .warning.rebuild { border-color: #6d5b2f; background: #332c18; color: #f1d697; }
+.warning.firstjeudi { border-color: #a86a4c; background: #40281e; color: #ffd2a8; }
 
 /* ---------- layout ---------- */
 .layout { display: grid; grid-template-columns: 1fr 1fr; }

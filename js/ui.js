@@ -27,7 +27,7 @@
       const ids = [
         'app', 'coins', 'cps', 'power', 'clicks', 'slip-label', 'slip-meter',
         'troll-label', 'troll-meter', 'troll-scope', 'scope-bars',
-        'chauve-warning', 'rebuild-warning', 'feed', 'achievements',
+        'chauve-warning', 'rebuild-warning', 'firstjeudi-warning', 'feed', 'achievements',
         'achievement-count', 'shop', 'tools', 'albums', 'latest-fortune',
         'gallery', 'toto-count', 'url-label', 'url-value', 'url-status',
         'url-post', 'url-shuffle', 'bloub-count', 'posted-count',
@@ -553,6 +553,12 @@
       if (state.rebuilding()) {
         r['rebuild-warning'].textContent = '🦀 cargo build --release · production 0 · ' +
           Math.ceil((s.rebuildUntil - now) / 1000) + ' s';
+      }
+      r['firstjeudi-warning'].hidden = !state.firstJeudiActive();
+      if (state.firstJeudiActive()) {
+        r['firstjeudi-warning'].textContent = '🍻 First Jeudi ×' +
+          (s.firstJeudiFactor === 3 ? 3 : 2) + ' · ' +
+          Math.ceil((s.firstJeudiUntil - now) / 1000) + ' s';
       }
       r['lifetime'].textContent = state.fmt(s.lifetime) + ' ◈';
       r['xp'].textContent = state.fmt(s.xp);

@@ -27,7 +27,7 @@
   ];
 
   // Prices and base CPS are derived from Cookie Clicker's own balance curves
-  // (main.js v2.058): first 13 real tiers (Cursor → Antimatter Condenser),
+  // (main.js v2.058): first 14 real tiers (Cursor → Prism),
   // plus the gcoincoin phantom. Copy price increase is 1.15.
   // CPS values are halved on top, as requested.
   CC.BUILDINGS = [
@@ -85,6 +85,10 @@
     {
       id: 'table-volante', icon: '🪑', name: 'Table volante', cost: 170000000000000, cps: 215000000,
       desc: 'Une table qui vole. On ne pose rien dessus, surtout pas le backend.',
+    },
+    {
+      id: 'first-jeudi', icon: '🍻', name: 'First Jeudi trop bruyant', cost: 2100000000000000, cps: 1450000000,
+      desc: 'Les moules se retrouvent, commandent des demis et parlent tous en même temps. C’est trop bruyant.',
     },
     {
       id: 'gcoincoin', icon: '💾', name: 'gcoincoin 0.1', cost: Infinity, cps: 0,
@@ -267,6 +271,8 @@
     { who: 'pinnipède<', text: 'HTTPS activé : le cadenas est vert, le slip est sauvé.' },
     { who: 'souffleuse<', text: 'BRRRRRR… (la souffleuse à feuilles est en marche)' },
     { who: 'table-volante<', text: 'La table vole. Elle ne rendra pas le backend.' },
+    { who: 'first-jeudi<', text: 'Tout le monde parle en même temps. On n’entend plus la tribune.' },
+    { who: 'moule<', text: 'C’est le First Jeudi. Quelqu’un a commandé 42 demis.' },
   ];
 
   // Hidden for now: the fortune-author game is too easy.
@@ -348,6 +354,8 @@
     { id: 'https', icon: '🔒', name: 'Cadenas vert', check: (s) => !!s.goodies.https },
     { id: 'souffleuse', icon: '🍂', name: 'BRRRR', check: (s) => (s.owned.souffleuse || 0) > 0 },
     { id: 'table-volante', icon: '🪑', name: 'Meuble volant', check: (s) => (s.owned['table-volante'] || 0) > 0 },
+    { id: 'first-jeudi', icon: '🍻', name: 'First Jeudi', check: (s) => (s.owned['first-jeudi'] || 0) > 0 },
+    { id: 'first-jeudi-5', icon: '📢', name: 'Trop bruyant', check: (s) => (s.firstJeudiEvents || 0) >= 5 },
     { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', wtm: true, check: (s) => (s.wtmWins || 0) >= 1 },
     { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', wtm: true, check: (s) => (s.wtmWins || 0) >= 10 },
     { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', wtm: true, check: (s) => (s.wtmBest || 0) >= 5 },

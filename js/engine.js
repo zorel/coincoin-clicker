@@ -41,6 +41,7 @@
       if (!s.nextGlitch) S().schedule();
       if (!s.currentUrl) s.currentUrl = S().randomUrl();
       this.nextBlower = now() + rand(25000, 50000);
+      this.scheduleFirstJeudi();
       this.bindVisibility();
       if (offline) {
         U().log(
@@ -74,6 +75,7 @@
       this.lastTick = now();
       this.lastCheck = now();
       this.nextBlower = now() + rand(25000, 50000);
+      this.scheduleFirstJeudi();
       this.duckShown = !!(s.duckUntil && now() < s.duckUntil);
       this.dogShown = !!(s.dogUntil && now() < s.dogUntil);
       U().showDuck(this.duckShown);
@@ -116,6 +118,51 @@
       U().log('Sauvegarde importée depuis un fichier JSON.', 'system', 'wmCoinCoin<');
       U().notice('📥 Sauvegarde importée');
       return true;
+    },
+
+    scheduleFirstJeudi() {
+      const s = S().s;
+      if (S().owned('first-jeudi') > 0) {
+        if (!s.nextFirstJeudi || s.nextFirstJeudi < now() - 10000) {
+          s.nextFirstJeudi = now() + rand(8000, 20000);
+        }
+      } else {
+        s.nextFirstJeudi = 0;
+      }
+    },
+
+    firstJeudiEvent() {
+      const s = S().s;
+      const date = new Date();
+      const real = date.getDay() === 4 && date.getDate() <= 7;
+      const factor = real ? 3 : 2;
+      const duration = real ? 60000 : 30000;
+      s.firstJeudiUntil = now() + duration;
+      s.firstJeudiFactor = factor;
+      s.firstJeudiEvents += 1;
+      s.nextFirstJeudi = now() + rand(120000, 240000);
+
+      let damage = real ? 8 : 4;
+      if (s.goodies.ultime) damage = 0;
+      else {
+        if (s.goodies.kevlar) damage /= 2;
+        if (s.goodies.https) damage /= 2;
+      }
+      if (damage > 0) S().addSlip(-damage);
+      if (s.settings.sound) CC.Audio.crowd();
+
+      U().log(
+        '🍻 First Jeudi trop bruyant : tout le monde parle en même temps. ' +
+        'Production ×' + factor + ' pendant ' + duration / 1000 +
+        ' s, slip −' + Math.round(damage) + ' %.',
+        'danger', 'first-jeudi<'
+      );
+      U().notice(
+        '🍻 First Jeudi trop bruyant · ×' + factor + ' pendant ' +
+        duration / 1000 + ' s'
+      );
+      this.progress();
+      U().render();
     },
 
     newWtmRound() {
@@ -296,6 +343,10 @@
       }
       if (b.id === 'table-volante') {
         U().notice('🪑 La table volante décolle. Personne ne sait pourquoi.');
+      }
+      if (b.id === 'first-jeudi') {
+        s.nextFirstJeudi = now() + 5000;
+        U().notice('🍻 Le First Jeudi approche. Ça va être bruyant.');
       }
       this.progress();
       U().refreshStatic();
@@ -629,6 +680,13 @@
         }
       } else {
         this.nextBlower = t + 30000;
+      }
+
+      if (S().owned('first-jeudi') > 0) {
+        if (!s.nextFirstJeudi) s.nextFirstJeudi = t + rand(8000, 20000);
+        if (t >= s.nextFirstJeudi) this.firstJeudiEvent();
+      } else {
+        s.nextFirstJeudi = 0;
       }
 
       if (s.rebuildUntil && t >= s.rebuildUntil) {
