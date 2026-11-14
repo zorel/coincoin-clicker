@@ -474,7 +474,7 @@
         s.duckKills += 1;
         U().log('PAN ! PAN ! +' + S().fmt(bonus) + ' coins', 'system', 'vous<');
         U().notice('🦆 PAN ! PAN ! +' + S().fmt(bonus) + ' coins');
-        CC.Audio.pan();
+        CC.Audio.quack();
       }
       this.progress();
       U().render();
@@ -520,6 +520,7 @@
       s.nextDuck = now() + rand(26000, 45000);
       this.duckShown = true;
       U().showDuck(true);
+      CC.Audio.quack();
       U().log('Un canard traverse la tribune ASCII. Il a l’air content.', '', 'canard<');
     },
 

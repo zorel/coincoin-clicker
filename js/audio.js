@@ -4,6 +4,7 @@
 
   const Audio = {
     ctx: null,
+    quackAudio: null,
 
     init() {
       if (this.ctx) {
@@ -50,6 +51,23 @@
     pan() {
       this.tone(180, 880, 0.12, 'square', 0.045);
       setTimeout(() => this.tone(900, 160, 0.18, 'square', 0.035), 110);
+    },
+
+    quack() {
+      if (!this.enabled()) return;
+      if (!this.quackAudio) {
+        // Duck quack by Bosnow, downloaded from Uppbeat.
+        this.quackAudio = new window.Audio('assets/duck-quack.mp3');
+        this.quackAudio.preload = 'auto';
+        this.quackAudio.volume = 0.65;
+      }
+      try {
+        this.quackAudio.currentTime = 0;
+        const playing = this.quackAudio.play();
+        if (playing && playing.catch) playing.catch(() => {});
+      } catch (err) {
+        /* Autoplay policy: the next user gesture will retry. */
+      }
     },
 
     blower() {

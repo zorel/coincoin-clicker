@@ -524,6 +524,8 @@ code { font: inherit; }
 #rebirth:disabled { opacity: 0.5; cursor: not-allowed; }
 .footer-bottom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 9px; color: #789681; }
 #status { flex: 1; min-width: 200px; }
+.credit { font-size: 9px; color: #789681; }
+.credit a { color: #9fc6a3; }
 .sound-toggle {
   background: #26352b;
   border: 1px solid #455746;
