@@ -36,10 +36,12 @@
         'rebirth-sub', 'rebirth-progress', 'rebirth-note', 'lifetime',
         'xp', 'xp-mult', 'sound-toggle', 'status', 'notice', 'diodes',
         'version-note', 'fortune-count', 'fortune-note', 'last-save',
-        'wtm-stats', 'wtm-post', 'wtm-choices', 'wtm-feedback', 'wtm-next',
+        'wtm-block', 'wtm-stats', 'wtm-post', 'wtm-choices', 'wtm-feedback', 'wtm-next',
       ];
       for (const id of ids) this.refs[id] = $(id);
-      this.refs['achievement-count'].textContent = '0 / ' + CC.ACHIEVEMENTS.length;
+      this.refs['wtm-block'].hidden = !CC.WTM_ENABLED;
+      const visibleAchievements = CC.ACHIEVEMENTS.filter((a) => CC.WTM_ENABLED || !a.wtm);
+      this.refs['achievement-count'].textContent = '0 / ' + visibleAchievements.length;
       this.refs.slipMeter = this.refs['slip-meter'];
       this.refs.trollMeter = this.refs['troll-meter'];
 
@@ -328,8 +330,9 @@
     buildAchievements() {
       const box = this.refs.achievements;
       box.replaceChildren();
-      const unlocked = CC.ACHIEVEMENTS.filter((a) => S().achievement(a.id));
-      this.refs['achievement-count'].textContent = unlocked.length + ' / ' + CC.ACHIEVEMENTS.length;
+      const visible = CC.ACHIEVEMENTS.filter((a) => CC.WTM_ENABLED || !a.wtm);
+      const unlocked = visible.filter((a) => S().achievement(a.id));
+      this.refs['achievement-count'].textContent = unlocked.length + ' / ' + visible.length;
       if (!unlocked.length) {
         box.append(el('div', 'empty', 'Le premier clic est le plus difficile.'));
         return;
@@ -340,6 +343,11 @@
     },
 
     renderWtm() {
+      if (!CC.WTM_ENABLED) {
+        this.refs['wtm-block'].hidden = true;
+        return;
+      }
+      this.refs['wtm-block'].hidden = false;
       const s = S().s;
       const stats = this.refs['wtm-stats'];
       const post = this.refs['wtm-post'];

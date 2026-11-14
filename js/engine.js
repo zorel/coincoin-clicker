@@ -119,6 +119,10 @@
     },
 
     newWtmRound() {
+      if (!CC.WTM_ENABLED) {
+        this.wtm = null;
+        return null;
+      }
       const pool = (window.FORTUNES || []).filter(
         (f) => f.a && f.t.length >= 30 && f.t.length <= 500
       );

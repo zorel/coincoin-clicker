@@ -341,6 +341,7 @@
     evaluateAchievements() {
       const fresh = [];
       for (const a of CC.ACHIEVEMENTS) {
+        if (a.wtm && !CC.WTM_ENABLED) continue;
         if (!this.achievement(a.id) && a.check(this.s)) {
           this.s.achievements.push(a.id);
           fresh.push(a);

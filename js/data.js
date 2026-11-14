@@ -267,9 +267,10 @@
     { who: 'pinnipède<', text: 'HTTPS activé : le cadenas est vert, le slip est sauvé.' },
     { who: 'souffleuse<', text: 'BRRRRRR… (la souffleuse à feuilles est en marche)' },
     { who: 'table-volante<', text: 'La table vole. Elle ne rendra pas le backend.' },
-    { who: 'wtm<', text: 'Qui a posté ça ? L’auteur est masqué.' },
   ];
 
+  // Hidden for now: the fortune-author game is too easy.
+  CC.WTM_ENABLED = false;
   CC.WTM_FALLBACK = ['moule_du_fond', 'root', 'troll', 'le_chauve', 'DaPlopBot', 'Alice'];
 
   CC.DOG_LINES = [
@@ -347,9 +348,9 @@
     { id: 'https', icon: '🔒', name: 'Cadenas vert', check: (s) => !!s.goodies.https },
     { id: 'souffleuse', icon: '🍂', name: 'BRRRR', check: (s) => (s.owned.souffleuse || 0) > 0 },
     { id: 'table-volante', icon: '🪑', name: 'Meuble volant', check: (s) => (s.owned['table-volante'] || 0) > 0 },
-    { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', check: (s) => (s.wtmWins || 0) >= 1 },
-    { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', check: (s) => (s.wtmWins || 0) >= 10 },
-    { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', check: (s) => (s.wtmBest || 0) >= 5 },
+    { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', wtm: true, check: (s) => (s.wtmWins || 0) >= 1 },
+    { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', wtm: true, check: (s) => (s.wtmWins || 0) >= 10 },
+    { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', wtm: true, check: (s) => (s.wtmBest || 0) >= 5 },
   ];
 
   CC.FORTUNE_TIERS = {};
