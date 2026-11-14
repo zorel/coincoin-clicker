@@ -234,12 +234,13 @@
         const button = el('button', 'tool' + (state.locked ? ' locked' : ''));
         button.type = 'button';
         button.dataset.goodie = goodie.id;
-        const title = el('span', 'tool-name', goodie.icon + ' ' + goodie.name);
+        const label = typeof goodie.name === 'function' ? goodie.name(S().s) : goodie.name;
+        const title = el('span', 'tool-name', goodie.icon + ' ' + label);
         const cost = el('b');
         const desc = el('span', 'tool-desc');
         button.append(title, cost, desc);
         tools.append(button);
-        this.toolRefs[goodie.id] = { button, cost, desc, goodie };
+        this.toolRefs[goodie.id] = { button, cost, desc, title, goodie };
       }
     },
 
@@ -458,9 +459,15 @@
         const ref = this.toolRefs[goodie.id];
         if (!ref) continue;
         const { available, cost, owned, locked } = this.goodieState(goodie);
-        ref.cost.textContent = owned && !goodie.repeatable
-          ? 'installé'
-          : locked ? 'verrouillé' : state.fmt(cost) + ' coins';
+        ref.title.textContent = goodie.icon + ' ' +
+          (typeof goodie.name === 'function' ? goodie.name(state.s) : goodie.name);
+        const pyMaxed = goodie.id === 'pycoincoin' &&
+          (state.s.pycoincoinLevel || 0) >= CC.PYCOINCOIN_VERSIONS.length;
+        ref.cost.textContent = pyMaxed
+          ? 'version finale'
+          : owned && !goodie.repeatable
+            ? 'installé'
+            : locked ? 'verrouillé' : state.fmt(cost) + ' coins';
         ref.desc.textContent = typeof goodie.desc === 'function' ? goodie.desc(state.s) : goodie.desc;
         if (goodie.id === 'click') {
           ref.desc.textContent = 'Niveau clic ' + state.s.powerLevel + ' · ' + (typeof goodie.desc === 'function' ? goodie.desc(state.s) : '');

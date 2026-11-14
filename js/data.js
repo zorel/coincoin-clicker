@@ -93,6 +93,16 @@
     },
   ];
 
+  CC.PYCOINCOIN_VERSIONS = [
+    { v: '0.2', bonus: 0.02, cost: 5000 },
+    { v: '0.3', bonus: 0.03, cost: 15000 },
+    { v: '0.4', bonus: 0.04, cost: 45000 },
+    { v: '0.5', bonus: 0.05, cost: 120000 },
+    { v: '0.6', bonus: 0.06, cost: 300000 },
+    { v: '0.6f', bonus: 0.07, cost: 750000 },
+    { v: '0.7.17', bonus: 0.10, cost: 1800000 },
+  ];
+
   CC.GOODIES = [
     {
       id: 'click', icon: '☝️', name: 'Muscler le clic', repeatable: true,
@@ -121,9 +131,30 @@
       available: (s) => !s.goodies.casque,
     },
     {
-      id: 'pycoincoin', icon: '🐍', name: 'pyCoinCoin 0.7.17', cost: () => 5000,
-      desc: () => '+5 % de production. Compatible Python 2.3, à peu près.',
-      available: (s) => !s.goodies.pycoincoin,
+      id: 'pycoincoin', icon: '🐍', repeatable: true,
+      name: (s) => {
+        const level = Math.min(s.pycoincoinLevel || 0, CC.PYCOINCOIN_VERSIONS.length);
+        const version = CC.PYCOINCOIN_VERSIONS[Math.max(0, level - 1)];
+        return 'pyCoinCoin ' + version.v;
+      },
+      cost: (s) => {
+        const level = Math.min(s.pycoincoinLevel || 0, CC.PYCOINCOIN_VERSIONS.length);
+        return level < CC.PYCOINCOIN_VERSIONS.length
+          ? CC.PYCOINCOIN_VERSIONS[level].cost : Infinity;
+      },
+      desc: (s) => {
+        const level = Math.min(s.pycoincoinLevel || 0, CC.PYCOINCOIN_VERSIONS.length);
+        const current = level ? CC.PYCOINCOIN_VERSIONS[level - 1] : null;
+        const next = level < CC.PYCOINCOIN_VERSIONS.length
+          ? CC.PYCOINCOIN_VERSIONS[level] : null;
+        const cur = current
+          ? 'Version ' + current.v + ' · +' + Math.round(current.bonus * 100) + ' %.' : '';
+        const nxt = next
+          ? ' Prochaine : ' + next.v + ' · +' + Math.round(next.bonus * 100) + ' %.'
+          : ' Version finale atteinte.';
+        return (cur + nxt + ' Compatible Python 2.3, à peu près.').trim();
+      },
+      available: (s) => (s.pycoincoinLevel || 0) < CC.PYCOINCOIN_VERSIONS.length,
     },
     {
       id: 'quteqoin', icon: '🐧', name: 'quteqoin', cost: () => 25000,

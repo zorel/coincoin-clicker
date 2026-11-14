@@ -58,6 +58,7 @@
       nextBotUrl: 0,
       lastPreums: '',
       lastSave: 0,
+      pycoincoinLevel: 0,
       wtmWins: 0,
       wtmLosses: 0,
       wtmStreak: 0,
@@ -96,7 +97,7 @@
       'gcoincoinClicks', 'trolls', 'troll', 'frenzyUntil', 'chauveUntil',
       'rebuildUntil', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
       'duckUntil', 'nextDog', 'dogUntil', 'nextChauve', 'nextBotUrl',
-      'lastSave', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
+      'lastSave', 'pycoincoinLevel', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
     ];
     for (const key of numeric) {
       const n = Number(base[key]);
@@ -111,6 +112,16 @@
       base[key] = Math.max(0, Math.floor(base[key] || 0));
     }
     base.wtmBest = Math.max(base.wtmBest, base.wtmStreak);
+
+    const pyVersions = CC.PYCOINCOIN_VERSIONS.length;
+    let pyLevel = Math.max(0, Math.min(pyVersions, Math.floor(base.pycoincoinLevel || 0)));
+    if (pyLevel === 0 && data.goodies && data.goodies.pycoincoin) {
+      // Old saves had the single 0.7.17 goodie: keep its final version.
+      pyLevel = pyVersions;
+    }
+    base.pycoincoinLevel = pyLevel;
+    if (pyLevel > 0) base.goodies.pycoincoin = true;
+    else delete base.goodies.pycoincoin;
 
     for (const key of ['totoz', 'fortunes', 'achievements', 'urlsPosted', 'seenBuildings']) {
       base[key] = Array.isArray(data[key])
@@ -263,7 +274,11 @@
 
     goodieMult() {
       let mult = 1;
-      if (this.s.goodies.pycoincoin) mult += 0.05;
+      const pyLevel = Math.min(
+        Math.max(0, this.s.pycoincoinLevel || 0),
+        CC.PYCOINCOIN_VERSIONS.length
+      );
+      if (pyLevel > 0) mult += CC.PYCOINCOIN_VERSIONS[pyLevel - 1].bonus;
       if (this.s.goodies.quteqoin) mult += 0.08;
       if (this.s.goodies.rails) mult += 0.12;
       if (this.s.goodies.pull) mult += 0.10;

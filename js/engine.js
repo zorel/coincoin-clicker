@@ -310,6 +310,10 @@
 
     goodieAvailable(goodie) {
       if (typeof goodie.locked === 'function' && goodie.locked(S().s)) return false;
+      if (goodie.id === 'pycoincoin' &&
+          (S().s.pycoincoinLevel || 0) >= CC.PYCOINCOIN_VERSIONS.length) {
+        return false;
+      }
       if (goodie.repeatable) return true;
       if (S().s.goodies[goodie.id]) return false;
       if (typeof goodie.available === 'function') return goodie.available(S().s);
@@ -331,6 +335,19 @@
         S().addSlip(50);
         U().log('Slip reprisé : parser XML opérationnel.', 'system');
         U().notice('🪡 Slip réparé');
+      } else if (goodie.id === 'pycoincoin') {
+        const level = s.pycoincoinLevel || 0;
+        const version = CC.PYCOINCOIN_VERSIONS[level];
+        s.pycoincoinLevel = level + 1;
+        s.goodies.pycoincoin = true;
+        U().log(
+          'pyCoinCoin ' + version.v + ' installé · +' +
+          Math.round(version.bonus * 100) + ' % de production.', 'system', 'python<'
+        );
+        U().notice(
+          '🐍 pyCoinCoin ' + version.v + ' · +' +
+          Math.round(version.bonus * 100) + ' %'
+        );
       } else {
         s.goodies[goodie.id] = true;
         if (goodie.id === 'rust') {
