@@ -30,7 +30,7 @@
         'chauve-warning', 'rebuild-warning', 'firstjeudi-warning', 'feed', 'achievements',
         'achievement-count', 'shop', 'tools', 'albums', 'latest-fortune',
         'gallery', 'toto-count', 'url-label', 'url-value', 'url-status',
-        'url-post', 'url-shuffle', 'bloub-count', 'posted-count',
+        'url-post', 'url-shuffle', 'bloub-count', 'posted-count', 'mmenal-note',
         'shop-hint', 'slip-toggle', 'owned-box', 'owned-shop', 'owned-count',
         'duck', 'dog', 'stage', 'version-label', 'app-name', 'rebirth',
         'rebirth-sub', 'rebirth-progress', 'rebirth-note', 'lifetime',
@@ -567,6 +567,13 @@
       r['fortune-count'].textContent = s.fortunes.length + ' / ' + (window.FORTUNES ? window.FORTUNES.length : 0);
       r['bloub-count'].textContent = state.fmt(s.bloubs);
       r['posted-count'].textContent = s.urlsPosted.length + ' / ' + CC.URLS.length;
+      const mmenal = r['mmenal-note'];
+      mmenal.hidden = !s.goodies.mmenal;
+      if (s.goodies.mmenal) {
+        const info = E().mmenalInfo();
+        mmenal.textContent = '🧮 mmenal< : silence ' + Math.round(info.quiet) +
+          ' s · probabilité de double post ' + Math.round(info.chance * 100) + ' %';
+      }
       this.updateShop();
       this.updateTools();
       this.updateRebirth();

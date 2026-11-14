@@ -176,6 +176,11 @@
       available: (s) => !s.goodies.https,
     },
     {
+      id: 'mmenal', icon: '🧮', name: 'Effet mmenal<', cost: () => 600000,
+      desc: () => 'Théorème de tribune : plus le silence dure, plus deux moules risquent de poster en même temps. Les doubles posts rapportent des coins.',
+      available: (s) => !s.goodies.mmenal,
+    },
+    {
       id: 'pull', icon: '👕', name: 'Pull « Je bande pour Emacs »', cost: () => 12000,
       desc: () => '+10 % de production. Le service, pas les sources.',
       available: (s) => !s.goodies.pull,
@@ -273,6 +278,7 @@
     { who: 'table-volante<', text: 'La table vole. Elle ne rendra pas le backend.' },
     { who: 'first-jeudi<', text: 'Tout le monde parle en même temps. On n’entend plus la tribune.' },
     { who: 'moule<', text: 'C’est le First Jeudi. Quelqu’un a commandé 42 demis.' },
+    { who: 'mmenal<', text: 'Théorème : plus la tribune est silencieuse, plus deux moules vont poster en même temps.' },
   ];
 
   // Hidden for now: the fortune-author game is too easy.
@@ -356,6 +362,8 @@
     { id: 'table-volante', icon: '🪑', name: 'Meuble volant', check: (s) => (s.owned['table-volante'] || 0) > 0 },
     { id: 'first-jeudi', icon: '🍻', name: 'First Jeudi', check: (s) => (s.owned['first-jeudi'] || 0) > 0 },
     { id: 'first-jeudi-5', icon: '📢', name: 'Trop bruyant', check: (s) => (s.firstJeudiEvents || 0) >= 5 },
+    { id: 'mmenal', icon: '🧮', name: 'Double post', check: (s) => (s.mmenalEvents || 0) >= 1 },
+    { id: 'mmenal-5', icon: '📈', name: 'Théorème vérifié', check: (s) => (s.mmenalEvents || 0) >= 5 },
     { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', wtm: true, check: (s) => (s.wtmWins || 0) >= 1 },
     { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', wtm: true, check: (s) => (s.wtmWins || 0) >= 10 },
     { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', wtm: true, check: (s) => (s.wtmBest || 0) >= 5 },

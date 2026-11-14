@@ -49,6 +49,7 @@
       firstJeudiFactor: 2,
       firstJeudiEvents: 0,
       nextFirstJeudi: 0,
+      mmenalEvents: 0,
       urlsPosted: [],
       currentUrl: null,
       nextGlitch: 0,
@@ -100,7 +101,7 @@
       'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
       'gcoincoinClicks', 'trolls', 'troll', 'frenzyUntil', 'chauveUntil',
       'rebuildUntil', 'firstJeudiUntil', 'firstJeudiFactor', 'firstJeudiEvents',
-      'nextFirstJeudi', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
+      'nextFirstJeudi', 'mmenalEvents', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
       'duckUntil', 'nextDog', 'dogUntil', 'nextChauve', 'nextBotUrl',
       'lastSave', 'pycoincoinLevel', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
     ];
@@ -113,7 +114,7 @@
     for (const key of [
       'clicks', 'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
       'gcoincoinClicks', 'trolls', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
-      'firstJeudiEvents',
+      'firstJeudiEvents', 'mmenalEvents',
     ]) {
       base[key] = Math.max(0, Math.floor(base[key] || 0));
     }
@@ -402,6 +403,7 @@
         wtmStreak: this.s.wtmStreak,
         wtmBest: this.s.wtmBest,
         firstJeudiEvents: this.s.firstJeudiEvents,
+        mmenalEvents: this.s.mmenalEvents,
         lastPreums: this.s.lastPreums,
         settings: this.s.settings,
       };

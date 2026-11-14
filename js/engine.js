@@ -34,6 +34,7 @@
     started: false,
     wtm: null,
     nextBlower: 0,
+    lastTribunePostAt: 0,
 
     init() {
       const offline = S().load();
@@ -41,6 +42,7 @@
       if (!s.nextGlitch) S().schedule();
       if (!s.currentUrl) s.currentUrl = S().randomUrl();
       this.nextBlower = now() + rand(25000, 50000);
+      this.lastTribunePostAt = now();
       this.scheduleFirstJeudi();
       this.bindVisibility();
       if (offline) {
@@ -75,6 +77,7 @@
       this.lastTick = now();
       this.lastCheck = now();
       this.nextBlower = now() + rand(25000, 50000);
+      this.lastTribunePostAt = now();
       this.scheduleFirstJeudi();
       this.duckShown = !!(s.duckUntil && now() < s.duckUntil);
       this.dogShown = !!(s.dogUntil && now() < s.dogUntil);
@@ -118,6 +121,46 @@
       U().log('Sauvegarde importée depuis un fichier JSON.', 'system', 'wmCoinCoin<');
       U().notice('📥 Sauvegarde importée');
       return true;
+    },
+
+    mmenalInfo() {
+      const quiet = Math.max(0, (now() - (this.lastTribunePostAt || now())) / 1000);
+      return { quiet, chance: Math.min(0.9, quiet / 40) };
+    },
+
+    doublePost(info) {
+      const s = S().s;
+      const first = pick(CC.CHATTER);
+      let second = pick(CC.CHATTER);
+      for (let i = 0; i < 6 && second === first; i += 1) second = pick(CC.CHATTER);
+      U().log(first.text, '', first.who);
+      U().log(second.text, '', second.who);
+      const bonus = Math.max(20, Math.floor(S().cps() * 3));
+      this.gain(bonus);
+      s.mmenalEvents += 1;
+      this.lastTribunePostAt = now();
+      U().log(
+        'Effet mmenal< : deux moules ont posté en même temps après ' +
+        Math.round(info.quiet) + ' s de silence · +' + S().fmt(bonus) + ' coins.',
+        'system', 'mmenal<'
+      );
+      U().notice('🧮 Double post mmenal< · +' + S().fmt(bonus) + ' coins');
+      this.progress();
+      U().render();
+    },
+
+    tribuneChatter() {
+      const s = S().s;
+      if (s.goodies.mmenal) {
+        const info = this.mmenalInfo();
+        if (Math.random() < info.chance) {
+          this.doublePost(info);
+          return;
+        }
+      }
+      const line = pick(CC.CHATTER);
+      U().log(line.text, '', line.who);
+      this.lastTribunePostAt = now();
     },
 
     scheduleFirstJeudi() {
@@ -498,6 +541,7 @@
         CC.Audio.pan();
       }
       if (s.troll >= 100) this.frenzy();
+      this.lastTribunePostAt = now();
       this.progress();
       U().updateUrl();
       U().render();
@@ -602,6 +646,7 @@
         U().log('a posté ' + entry.label + ' (personne ne clique)', '', bot + '<');
         U().updateUrl();
       }
+      this.lastTribunePostAt = now();
     },
 
     glitch() {
@@ -641,8 +686,7 @@
       if (t >= s.nextGlitch) this.glitch();
       if (t >= s.nextChatter) {
         s.nextChatter = t + rand(9000, 20000);
-        const line = pick(CC.CHATTER);
-        U().log(line.text, '', line.who);
+        this.tribuneChatter();
       }
       if (t >= s.nextFortune) {
         s.nextFortune = t + Math.max(8000, 23000 - this.fritureCount() * 400) + rand(0, 8000);

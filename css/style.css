@@ -283,6 +283,7 @@ code { font: inherit; }
 .post.warn { border-color: #a86a4c; background: #5a3728; }
 .bloub-line { border-top: 1px solid #2b3f31; margin-top: 9px; padding-top: 7px; font-size: 9px; color: #7f9984; }
 .bloub-line b { color: #9fe3e8; }
+.mmenal-note { font-size: 9px; color: #a9d4b2; padding: 7px 2px 0; line-height: 1.5; }
 
 /* ---------- whatthemoule ---------- */
 .wtm-prompt { font-size: 10px; color: #9cae9f; margin: 0 0 7px; }
