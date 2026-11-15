@@ -51,6 +51,7 @@
       nextFirstJeudi: 0,
       mmenalEvents: 0,
       urlsPosted: [],
+      ripPosted: [],
       currentUrl: null,
       nextGlitch: 0,
       nextChatter: 0,
@@ -131,7 +132,7 @@
     if (pyLevel > 0) base.goodies.pycoincoin = true;
     else delete base.goodies.pycoincoin;
 
-    for (const key of ['totoz', 'fortunes', 'achievements', 'urlsPosted', 'seenBuildings']) {
+    for (const key of ['totoz', 'fortunes', 'achievements', 'urlsPosted', 'ripPosted', 'seenBuildings']) {
       base[key] = Array.isArray(data[key])
         ? data[key].filter((v) => typeof v === 'string')
         : [];
@@ -390,6 +391,7 @@
         achievements: this.s.achievements,
         fortunes: this.s.fortunes,
         totoz: this.s.totoz,
+        ripPosted: this.s.ripPosted,
         seenBuildings: Array.isArray(this.s.seenBuildings) && this.s.seenBuildings.length
           ? this.s.seenBuildings : ['moule'],
         bloubs: this.s.bloubs,

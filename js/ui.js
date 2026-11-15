@@ -31,6 +31,7 @@
         'achievement-count', 'shop', 'tools', 'albums', 'latest-fortune',
         'gallery', 'toto-count', 'url-label', 'url-value', 'url-status',
         'url-post', 'url-shuffle', 'bloub-count', 'posted-count', 'mmenal-note',
+        'rip-block', 'rip-target', 'rip-status', 'rip-post', 'rip-next',
         'shop-hint', 'slip-toggle', 'owned-box', 'owned-shop', 'owned-count',
         'duck', 'dog', 'stage', 'version-label', 'app-name', 'rebirth',
         'rebirth-sub', 'rebirth-progress', 'rebirth-note', 'lifetime',
@@ -394,6 +395,39 @@
       }
     },
 
+    updateRip() {
+      const all = window.DEAD_BOUCHOTS || [];
+      const block = this.refs['rip-block'];
+      if (!all.length) {
+        block.hidden = true;
+        return;
+      }
+      block.hidden = false;
+      const info = E().ripInfo();
+      const target = this.refs['rip-target'];
+      const status = this.refs['rip-status'];
+      const post = this.refs['rip-post'];
+      const next = this.refs['rip-next'];
+      const stamp = window.DEAD_BOUCHOTS_VALIDATED_AT;
+      const date = stamp ? new Date(stamp).toLocaleDateString('fr-FR') : '';
+      status.textContent = info.posted + ' / ' + info.total + ' bouchots sans réponse' +
+        (date ? ' · validé le ' + date : '');
+      if (!info.target) {
+        target.textContent = 'Tous les bouchots disparus ont eu leur RIP. Rest in peace.';
+        target.title = '';
+        post.disabled = true;
+        next.disabled = true;
+        return;
+      }
+      target.textContent = info.target.name + ' — ' + info.target.server;
+      target.title = [
+        info.target.desc,
+        info.target.backend ? 'backend ' + info.target.backend : '',
+      ].filter(Boolean).join(' · ');
+      post.disabled = false;
+      next.disabled = info.unposted.length <= 1;
+    },
+
     updateUrl() {
       const s = S().s;
       const entry = s.currentUrl;
@@ -574,6 +608,7 @@
         mmenal.textContent = '🧮 mmenal< : silence ' + Math.round(info.quiet) +
           ' s · probabilité de double post ' + Math.round(info.chance * 100) + ' %';
       }
+      this.updateRip();
       this.updateShop();
       this.updateTools();
       this.updateRebirth();

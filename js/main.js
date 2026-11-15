@@ -27,6 +27,8 @@
     document.getElementById('dog').addEventListener('click', () => Engine.petDog());
     document.getElementById('url-post').addEventListener('click', () => Engine.postUrl());
     document.getElementById('url-shuffle').addEventListener('click', () => Engine.shuffleUrl());
+    document.getElementById('rip-post').addEventListener('click', () => Engine.postRip());
+    document.getElementById('rip-next').addEventListener('click', () => Engine.ripNext());
 
     document.getElementById('wtm-choices').addEventListener('click', (event) => {
       const button = event.target.closest('button[data-wtm-choice]');

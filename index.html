@@ -98,6 +98,15 @@
           <button class="post" id="url-post" type="button">POSTER</button>
         </div>
         <div class="bloub-line">BLOUB-O-MÈTRE : <b id="bloub-count">0</b> · une URL déjà postée fait « bloub »</div>
+        <div class="rip-block" id="rip-block" hidden>
+          <div class="rip-line">
+            <span class="rip-label">🪦 RIP</span>
+            <span class="rip-target" id="rip-target">…</span>
+            <button class="post" id="rip-post" type="button">POSTER RIP</button>
+            <button class="mini" id="rip-next" type="button" title="Voir un autre bouchot disparu">↻</button>
+          </div>
+          <div class="rip-status" id="rip-status"></div>
+        </div>
       </div>
       <div class="mmenal-note" id="mmenal-note" hidden></div>
 
@@ -117,7 +126,7 @@
       <div class="section"><span>▸ PINNIPÈDE TÉLÉSCRIPTEUR</span><span>● LIVE (FAUX)</span></div>
       <div class="feed" id="feed" role="log" aria-label="Fausse tribune"></div>
 
-      <div class="section"><span>▸ HAUTS FAITS INUTILES</span><span id="achievement-count">0 / 30</span></div>
+      <div class="section"><span>▸ HAUTS FAITS INUTILES</span><span id="achievement-count">0 / 32</span></div>
       <div class="achievements" id="achievements">
         <span class="empty">Le premier clic est le plus difficile.</span>
       </div>
@@ -172,6 +181,7 @@
 <noscript><p style="color:#fff;text-align:center">Ce bouchot a besoin de JavaScript. Même gcoincoin en a besoin, c'est dire.</p></noscript>
 
 <script src="js/fortunes.js"></script>
+<script src="js/dead-bouchots.js"></script>
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
 <script src="js/audio.js"></script>

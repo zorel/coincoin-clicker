@@ -35,6 +35,7 @@
     wtm: null,
     nextBlower: 0,
     lastTribunePostAt: 0,
+    ripTarget: null,
 
     init() {
       const offline = S().load();
@@ -43,6 +44,7 @@
       if (!s.currentUrl) s.currentUrl = S().randomUrl();
       this.nextBlower = now() + rand(25000, 50000);
       this.lastTribunePostAt = now();
+      this.ripTarget = null;
       this.scheduleFirstJeudi();
       this.bindVisibility();
       if (offline) {
@@ -78,6 +80,7 @@
       this.lastCheck = now();
       this.nextBlower = now() + rand(25000, 50000);
       this.lastTribunePostAt = now();
+      this.ripTarget = null;
       this.scheduleFirstJeudi();
       this.duckShown = !!(s.duckUntil && now() < s.duckUntil);
       this.dogShown = !!(s.dogUntil && now() < s.dogUntil);
@@ -517,6 +520,53 @@
       }
       U().refreshStatic();
       this.progress();
+    },
+
+    ripInfo() {
+      const s = S().s;
+      const all = window.DEAD_BOUCHOTS || [];
+      const ids = new Set(Array.isArray(s.ripPosted) ? s.ripPosted : []);
+      const posted = all.filter((entry) => ids.has(entry.id));
+      const unposted = all.filter((entry) => !ids.has(entry.id));
+      if (!this.ripTarget || !unposted.some((entry) => entry.id === this.ripTarget.id)) {
+        this.ripTarget = unposted[0] || null;
+      }
+      return {
+        all,
+        posted: posted.length,
+        total: all.length,
+        unposted,
+        target: this.ripTarget,
+        done: unposted.length === 0,
+      };
+    },
+
+    postRip() {
+      const info = this.ripInfo();
+      if (!info.target) return;
+      const s = S().s;
+      const entry = info.target;
+      s.ripPosted.push(entry.id);
+      this.lastTribunePostAt = now();
+      this.ripTarget = null;
+      U().log(
+        'RIP ' + entry.name + ' — le site ' + entry.server +
+        ' ne répond plus. Rest in peace.',
+        'danger', 'vous<'
+      );
+      U().notice('💀 RIP ' + entry.name);
+      this.progress();
+      U().updateRip();
+      U().render();
+      S().save();
+    },
+
+    ripNext() {
+      const info = this.ripInfo();
+      if (!info.target) return;
+      const others = info.unposted.filter((entry) => entry.id !== info.target.id);
+      if (others.length) this.ripTarget = pick(others);
+      U().updateRip();
     },
 
     postUrl() {

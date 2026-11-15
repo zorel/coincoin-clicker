@@ -364,6 +364,14 @@
     { id: 'first-jeudi-5', icon: '📢', name: 'Trop bruyant', check: (s) => (s.firstJeudiEvents || 0) >= 5 },
     { id: 'mmenal', icon: '🧮', name: 'Double post', check: (s) => (s.mmenalEvents || 0) >= 1 },
     { id: 'mmenal-5', icon: '📈', name: 'Théorème vérifié', check: (s) => (s.mmenalEvents || 0) >= 5 },
+    { id: 'rip-first', icon: '💀', name: 'Nécrologue', check: (s) => (s.ripPosted || []).length >= 1 },
+    {
+      id: 'rip-all', icon: '🪦', name: 'Rest in peace',
+      check: (s) => {
+        const list = window.DEAD_BOUCHOTS || [];
+        return list.length > 0 && list.every((entry) => (s.ripPosted || []).includes(entry.id));
+      },
+    },
     { id: 'wtm-first', icon: '🕵️', name: 'WhatTheMoule', wtm: true, check: (s) => (s.wtmWins || 0) >= 1 },
     { id: 'wtm-ten', icon: '🕵️‍♀️', name: 'Moule détective', wtm: true, check: (s) => (s.wtmWins || 0) >= 10 },
     { id: 'wtm-streak', icon: '🎯', name: 'Série de moules', wtm: true, check: (s) => (s.wtmBest || 0) >= 5 },
