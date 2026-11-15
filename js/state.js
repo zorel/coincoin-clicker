@@ -3,8 +3,10 @@
   'use strict';
 
   const KEY = 'coincoin-clicker-local-v2';
-  const SAVE_SCHEMA = 3;
+  const SAVE_SCHEMA = 4;
   const MAX_OFFLINE = 8 * 3600;
+  // Old saves only had the single pyCoinCoin 0.7.17 goodie (level 7).
+  const PYCOINCOIN_LEGACY_LEVEL = 7;
 
   const nf = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
   const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
@@ -45,6 +47,7 @@
       frenzyUntil: 0,
       chauveUntil: 0,
       rebuildUntil: 0,
+      closedUntil: 0,
       firstJeudiUntil: 0,
       firstJeudiFactor: 2,
       firstJeudiEvents: 0,
@@ -101,7 +104,7 @@
       'coins', 'runTotal', 'lifetime', 'clicks', 'powerLevel', 'slip', 'xp',
       'rebirths', 'bloubs', 'duckKills', 'dogPets', 'chauveEvents',
       'gcoincoinClicks', 'trolls', 'troll', 'frenzyUntil', 'chauveUntil',
-      'rebuildUntil', 'firstJeudiUntil', 'firstJeudiFactor', 'firstJeudiEvents',
+      'rebuildUntil', 'closedUntil', 'firstJeudiUntil', 'firstJeudiFactor', 'firstJeudiEvents',
       'nextFirstJeudi', 'mmenalEvents', 'nextGlitch', 'nextChatter', 'nextFortune', 'nextDuck',
       'duckUntil', 'nextDog', 'dogUntil', 'nextChauve', 'nextBotUrl',
       'lastSave', 'pycoincoinLevel', 'wtmWins', 'wtmLosses', 'wtmStreak', 'wtmBest',
@@ -126,7 +129,7 @@
     let pyLevel = Math.max(0, Math.min(pyVersions, Math.floor(base.pycoincoinLevel || 0)));
     if (pyLevel === 0 && data.goodies && data.goodies.pycoincoin) {
       // Old saves had the single 0.7.17 goodie: keep its final version.
-      pyLevel = pyVersions;
+      pyLevel = Math.min(PYCOINCOIN_LEGACY_LEVEL, pyVersions);
     }
     base.pycoincoinLevel = pyLevel;
     if (pyLevel > 0) base.goodies.pycoincoin = true;
@@ -165,6 +168,8 @@
     fmt(n) {
       if (!Number.isFinite(n)) return '∞';
       const abs = Math.abs(n);
+      if (abs >= 1e21) return nf1.format(n / 1e21) + 'Z';
+      if (abs >= 1e18) return nf1.format(n / 1e18) + 'E';
       if (abs >= 1e15) return nf1.format(n / 1e15) + 'P';
       if (abs >= 1e12) return nf1.format(n / 1e12) + 'T';
       if (abs >= 1e9) return nf1.format(n / 1e9) + 'G';
@@ -209,11 +214,12 @@
     },
 
     nextUnowned() {
-      return CC.BUILDINGS.find((b) => this.owned(b.id) === 0) || null;
+      return CC.BUILDINGS.find((b) => !b.minRebirth && this.owned(b.id) === 0) || null;
     },
 
     isBuildingVisible(building) {
       if (this.owned(building.id) > 0) return true;
+      if (building.minRebirth) return this.s.rebirths >= building.minRebirth;
       const next = this.nextUnowned();
       if (!next || next.id !== building.id) return false;
       if (next.id === CC.BUILDINGS[0].id) return true;
@@ -221,12 +227,16 @@
     },
 
     unlockBuildings() {
-      const next = this.nextUnowned();
-      if (!next || !this.isBuildingVisible(next)) return [];
       if (!Array.isArray(this.s.seenBuildings)) this.s.seenBuildings = [];
-      if (this.s.seenBuildings.includes(next.id)) return [];
-      this.s.seenBuildings.push(next.id);
-      return [next];
+      const fresh = [];
+      for (const b of CC.BUILDINGS) {
+        if (this.s.seenBuildings.includes(b.id)) continue;
+        if (this.owned(b.id) > 0) continue;
+        if (!this.isBuildingVisible(b)) continue;
+        this.s.seenBuildings.push(b.id);
+        fresh.push(b);
+      }
+      return fresh;
     },
 
     version() {
@@ -252,6 +262,11 @@
 
     versionMult() {
       return 1 + this.s.rebirths * 0.35;
+    },
+
+    updateMult() {
+      // Each wmCoinCoin update adds ×1.1 to click power.
+      return Math.pow(1.1, this.s.rebirths);
     },
 
     totozMult() {
@@ -330,6 +345,14 @@
       return Date.now() < this.s.chauveUntil;
     },
 
+    tribuneClosed() {
+      return Date.now() < this.s.closedUntil;
+    },
+
+    tribuneFactor() {
+      return this.tribuneClosed() ? 2 : 1;
+    },
+
     chauveFactor() {
       return this.chauveActive() ? 0.5 : 1;
     },
@@ -343,13 +366,13 @@
       let base = 0;
       for (const b of CC.BUILDINGS) base += b.cps * this.owned(b.id);
       return base * this.globalMult() * this.slipMult() * this.boost() *
-        this.chauveFactor();
+        this.chauveFactor() * this.tribuneFactor();
     },
 
     clickPower() {
       // All repeatable coin gains are halved for the slower balance.
-      return (1 + this.s.powerLevel * 2) * this.globalMult() * this.slipMult() *
-        this.boost() * 0.5;
+      return (1 + this.s.powerLevel * 2) * this.globalMult() * this.updateMult() *
+        this.slipMult() * this.boost() * 0.5;
     },
 
     achievement(id) {

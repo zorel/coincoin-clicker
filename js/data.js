@@ -90,6 +90,38 @@
       id: 'first-jeudi', icon: '🍻', name: 'First Jeudi trop bruyant', cost: 2100000000000000, cps: 1450000000,
       desc: 'Les moules se retrouvent, commandent des demis et parlent tous en même temps. C’est trop bruyant.',
     },
+    // Unlocked by the last six wmCoinCoin updates (rebirth levels 6 → 11),
+    // independently of the "next friture" shop chain.
+    {
+      id: 'presimoule', icon: '🐚', name: 'Présimoule', cost: 2.5e16, cps: 1e10,
+      desc: 'Une friture qui apparaît à chaque update pour présider le bouchot. Elle lit tout, ne répond jamais.',
+      minRebirth: 6,
+    },
+    {
+      id: 'jr-song', icon: '🎵', name: 'jr< new song', cost: 3e17, cps: 6.8e10,
+      desc: 'jr< a encore sorti un morceau. Le bouchot l’écoute en boucle, la production suit le tempo.',
+      minRebirth: 7,
+    },
+    {
+      id: 'poolpy', icon: '🐙', name: 'Poolpy et ses 350 ventouses', cost: 3.6e18, cps: 4.6e11,
+      desc: '350 ventouses, 350 posts par minute. Poolpy adhère à tout, surtout aux mauvaises idées.',
+      minRebirth: 8,
+    },
+    {
+      id: 'ipot', icon: '✍️', name: 'Post par ipot', cost: 4.3e19, cps: 3.1e12,
+      desc: 'ipot poste à votre place. Il ne lit pas, mais il poste vite. Personne ne clique.',
+      minRebirth: 9,
+    },
+    {
+      id: 'ib2p', icon: '🗜️', name: 'Compression des posts avec ib2p', cost: 5.2e20, cps: 2.1e13,
+      desc: 'ib2p compresse les posts. On ne sait pas ce que ça veut dire, mais ça produit.',
+      minRebirth: 10,
+    },
+    {
+      id: 'templeet', icon: '⚡', name: 'Templeet, plus rapide qu’Apache', cost: 6.2e21, cps: 1.4e14,
+      desc: 'Cette page a été générée par Templeet. Plus rapide qu’Apache, et surtout plus rapide que vos recompilations.',
+      minRebirth: 11,
+    },
     {
       id: 'gcoincoin', icon: '💾', name: 'gcoincoin 0.1', cost: Infinity, cps: 0,
       desc: 'Annoncé. Maintenant. Depuis 2003. Toujours pas sorti.',
@@ -105,6 +137,19 @@
     { v: '0.6', bonus: 0.06, cost: 300000 },
     { v: '0.6f', bonus: 0.07, cost: 750000 },
     { v: '0.7.17', bonus: 0.10, cost: 1800000 },
+    { v: '0.8.0-pre1', bonus: 0.11, cost: 4500000 },
+    { v: '0.8.0-pre3', bonus: 0.12, cost: 11000000 },
+    { v: '0.8.0-rc1', bonus: 0.13, cost: 26000000 },
+    { v: '0.8.0-rc2', bonus: 0.14, cost: 62000000 },
+    { v: '0.8.0-rc3', bonus: 0.15, cost: 150000000 },
+    { v: '0.8.0-rc4', bonus: 0.16, cost: 360000000 },
+    { v: '0.8.0', bonus: 0.17, cost: 860000000 },
+    { v: '0.8.2', bonus: 0.18, cost: 2100000000 },
+    { v: '0.8.3', bonus: 0.19, cost: 5000000000 },
+    { v: '0.8.4', bonus: 0.20, cost: 12000000000 },
+    { v: '0.8.5', bonus: 0.21, cost: 29000000000 },
+    { v: '0.8.6', bonus: 0.22, cost: 70000000000 },
+    { v: '0.8.8', bonus: 0.23, cost: 170000000000 },
   ];
 
   CC.GOODIES = [
@@ -207,6 +252,20 @@
       available: (s) => !s.goodies.rust,
       locked: (s) => s.rebirths < 8,
     },
+    {
+      id: 'tribune-close', icon: '📖', name: '18/12/2002 — fermeture de la tribune',
+      cost: () => 250000,
+      desc: () => 'La tribune ferme 10 minutes : aucun clic possible, production ×2. L’annonce est dans le feed. Faut lire.',
+      available: (s) => !s.goodies['tribune-close'],
+      locked: (s) => s.rebirths < 2,
+    },
+  ];
+
+  CC.TRIBUNE_CLOSURE = [
+    '18/12/2002 — La tribune ferme 10 minutes. Motif : mise à jour de wmCoinCoin, migration des slips et une balise <blink> jamais refermée.',
+    'Pendant la fermeture : clics interdits, production ×2. Les moules sont priées de lire l’annonce au lieu de poster « PREUMS ».',
+    'Le service rouvrira automatiquement. Les modérateurs remercient les 350 ventouses de Poolpy pour leur patience.',
+    'gcoincoin, lui, ne rouvrira pas. Faut lire.',
   ];
 
   CC.TOTOZ = [
@@ -279,6 +338,10 @@
     { who: 'first-jeudi<', text: 'Tout le monde parle en même temps. On n’entend plus la tribune.' },
     { who: 'moule<', text: 'C’est le First Jeudi. Quelqu’un a commandé 42 demis.' },
     { who: 'mmenal<', text: 'Théorème : plus la tribune est silencieuse, plus deux moules vont poster en même temps.' },
+    { who: 'Pierre Tramo<', text: 'Pierre Tramo est éternel.' },
+    { who: 'Pierre Tramo<', text: 'Ich bin ein Pierre Tramo.' },
+    { who: 'Pierre Tramo<', text: 'Nous somme tous des Pierre Tramo.' },
+    { who: 'Pierre Tramo<', text: 'FREE PIERRE TRAMO !' },
   ];
 
   // Hidden for now: the fortune-author game is too easy.

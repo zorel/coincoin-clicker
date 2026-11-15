@@ -35,6 +35,7 @@
     wtm: null,
     nextBlower: 0,
     lastTribunePostAt: 0,
+    closeNagAt: 0,
     ripTarget: null,
 
     init() {
@@ -321,6 +322,13 @@
 
     click() {
       const s = S().s;
+      if (S().tribuneClosed()) {
+        if (now() - this.closeNagAt > 3000) {
+          this.closeNagAt = now();
+          U().notice('🚫 Tribune fermée · faut lire l’annonce');
+        }
+        return;
+      }
       const amount = S().clickPower();
       this.gain(amount);
       s.clicks += 1;
@@ -449,6 +457,11 @@
           '🐍 pyCoinCoin ' + version.v + ' · +' +
           Math.round(version.bonus * 100) + ' %'
         );
+      } else if (goodie.id === 'tribune-close') {
+        s.goodies[goodie.id] = true;
+        s.closedUntil = now() + 10 * 60 * 1000;
+        for (const line of CC.TRIBUNE_CLOSURE) U().log(line, 'danger', 'root<');
+        U().notice('📖 Tribune fermée 10 min · production ×2 · faut lire');
       } else {
         s.goodies[goodie.id] = true;
         if (goodie.id === 'rust') {
@@ -791,6 +804,12 @@
         }
       }
 
+      if (s.closedUntil && t >= s.closedUntil) {
+        s.closedUntil = 0;
+        U().log('La tribune rouvre après 10 minutes de fermeture. Vous pouvez recliquer.', 'system', 'root<');
+        U().notice('📖 Tribune rouverte · les clics reviennent');
+      }
+
       const date = new Date();
       if (date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 1) {
         const day = date.toDateString();
@@ -829,11 +848,13 @@
       if (!result) return null;
       U().setVersion();
       U().log(
-        'Recompilation du bouchot : wmCoinCoin v' + result.version.v +
-        ' · +' + result.gain + ' XP de moule.', 'system', 'wmCoinCoin<'
+        'wmCoinCoin update is out! v' + result.version.v +
+        ' · +' + result.gain + ' XP de moule · clic ×' +
+        S().updateMult().toFixed(2).replace('.', ',') + '.', 'system', 'wmCoinCoin<'
       );
       U().log(next.note, 'system', 'interface<');
-      U().notice('♻️ wmCoinCoin v' + result.version.v + ' · +' + result.gain + ' XP de moule');
+      U().notice('♻️ wmCoinCoin update is out! v' + result.version.v + ' · +' + result.gain + ' XP de moule');
+      this.revealBuildings();
       U().refreshStatic();
       U().render();
       S().save();

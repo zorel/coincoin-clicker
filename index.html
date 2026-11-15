@@ -32,15 +32,16 @@
     <h1>COINCOIN CLICKER <span class="duck-sign">\_o&lt;</span></h1>
     <p>Il faut cultiver notre bouchot. La productivité est facultative.</p>
     <div class="warnings">
+      <div class="warning closed" id="tribune-warning" hidden></div>
       <div class="warning" id="chauve-warning" hidden></div>
       <div class="warning rebuild" id="rebuild-warning" hidden></div>
       <div class="warning firstjeudi" id="firstjeudi-warning" hidden></div>
     </div>
     <div class="rebirth-box rebirth-top">
-      <div class="rebirth-head"><span>RECOMPILER LE BOUCHOT</span><b id="rebirth-sub">→ wmCoinCoin v1.0</b></div>
+      <div class="rebirth-head"><span>wmCoinCoin update is out!</span><b id="rebirth-sub">→ wmCoinCoin v1.0</b></div>
       <div class="rebirth-track"><div id="rebirth-progress"></div></div>
       <div id="rebirth-note">Encore 1 500 coins sur cette tribune.</div>
-      <button id="rebirth" type="button">↻ Recommencer une nouvelle tribune</button>
+      <button id="rebirth" type="button">↻ Installer la mise à jour</button>
       <div class="version-note" id="version-note">Fenêtre brute. Aucune fioriture, comme en 2001.</div>
     </div>
   </header>
@@ -52,7 +53,7 @@
         <div class="total-label">COINCOINS DISPONIBLES</div>
         <div class="mini">
           <div><b id="cps">0/s</b>production</div>
-          <div><b id="power">1</b>par clic</div>
+          <div><b id="power">1</b>par clic <span class="mini-note" id="click-mult">×1,00 updates</span></div>
           <div><b id="clicks">0</b>clics</div>
         </div>
       </div>
@@ -64,7 +65,7 @@
         <div class="base">
           <button class="red" id="button" type="button" aria-label="Faire coin coin : \_o&lt;">\_o&lt;</button>
         </div>
-        <div class="stage-hint">APPUYER POUR MOULER · chaque clic est important*</div>
+        <div class="stage-hint" id="stage-hint">APPUYER POUR MOULER · chaque clic est important*</div>
       </div>
 
       <div class="meter-head">

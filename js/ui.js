@@ -27,7 +27,7 @@
       const ids = [
         'app', 'coins', 'cps', 'power', 'clicks', 'slip-label', 'slip-meter',
         'troll-label', 'troll-meter', 'troll-scope', 'scope-bars',
-        'chauve-warning', 'rebuild-warning', 'firstjeudi-warning', 'feed', 'achievements',
+        'chauve-warning', 'rebuild-warning', 'firstjeudi-warning', 'tribune-warning', 'feed', 'achievements',
         'achievement-count', 'shop', 'tools', 'albums', 'latest-fortune',
         'gallery', 'toto-count', 'url-label', 'url-value', 'url-status',
         'url-post', 'url-shuffle', 'bloub-count', 'posted-count', 'mmenal-note',
@@ -38,6 +38,7 @@
         'xp', 'xp-mult', 'sound-toggle', 'status', 'notice', 'diodes',
         'version-note', 'fortune-count', 'fortune-note', 'last-save',
         'wtm-block', 'wtm-stats', 'wtm-post', 'wtm-choices', 'wtm-feedback', 'wtm-next',
+        'button', 'stage-hint', 'click-mult',
       ];
       for (const id of ids) this.refs[id] = $(id);
       this.refs['wtm-block'].hidden = !CC.WTM_ENABLED;
@@ -540,8 +541,9 @@
       button.disabled = state.s.runTotal < next.need;
       sub.textContent = '→ wmCoinCoin v' + next.v;
       note.textContent = state.s.runTotal >= next.need
-        ? 'Prêt à recompiler : ' + next.note
-        : 'Encore ' + state.fmt(missing) + ' coins sur cette tribune. Prochaine version : v' + next.v + ' (' + state.fmt(next.need) + ').';
+        ? 'Prête à mettre à jour : ' + next.note
+        : 'Encore ' + state.fmt(missing) + ' coins sur cette tribune avant l’update v' + next.v +
+          ' (' + state.fmt(next.need) + '). Chaque update multiplie les clics par 1,1.';
     },
 
     render() {
@@ -552,6 +554,8 @@
       r.coins.textContent = state.fmt(s.coins);
       r.cps.textContent = state.fmtRate(state.cps());
       r.power.textContent = state.fmtDecimal(state.clickPower());
+      r['click-mult'].textContent = '×' +
+        state.updateMult().toFixed(2).replace('.', ',') + ' updates';
       r.clicks.textContent = state.fmt(s.clicks);
       r['slip-meter'].style.width = Math.max(0, Math.min(100, s.slip)) + '%';
       r['slip-meter'].style.background = s.slip < 25 ? '#e97760' : s.slip < 55 ? '#e6bb62' : '#a9d787';
@@ -594,6 +598,17 @@
           (s.firstJeudiFactor === 3 ? 3 : 2) + ' · ' +
           Math.ceil((s.firstJeudiUntil - now) / 1000) + ' s';
       }
+      const closed = state.tribuneClosed();
+      r['tribune-warning'].hidden = !closed;
+      if (closed) {
+        const left = Math.ceil((s.closedUntil - now) / 1000);
+        r['tribune-warning'].textContent = '📖 18/12/2002 · tribune fermée · production ×2 · ' +
+          left + ' s · faut lire';
+        r['stage-hint'].textContent = 'TRIBUNE FERMÉE · plus de clic pendant ' + left + ' s · faut lire';
+      } else {
+        r['stage-hint'].textContent = 'APPUYER POUR MOULER · chaque clic est important*';
+      }
+      r.button.disabled = closed;
       r['lifetime'].textContent = state.fmt(s.lifetime) + ' ◈';
       r['xp'].textContent = state.fmt(s.xp);
       r['xp-mult'].textContent = '×' + state.xpMult().toFixed(2) + ' XP';

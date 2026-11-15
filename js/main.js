@@ -42,10 +42,12 @@
       if (!next || !state.canRebirth()) return;
       const gain = Math.max(1, Math.floor(Math.sqrt(state.s.runTotal / 250)));
       const message = [
-        'Recommencer une nouvelle tribune ?',
+        'Installer la mise à jour wmCoinCoin ?',
         '',
         'wmCoinCoin v' + state.version().v + ' → v' + next.v,
         'XP de moule gagné : +' + gain,
+        'Multiplicateur de clic : ×' + state.updateMult().toFixed(2).replace('.', ',') +
+          ' → ×' + (state.updateMult() * 1.1).toFixed(2).replace('.', ','),
         'Les coins, bâtiments et goodies de cette tribune seront perdus.',
         'Les fortunes, totoz et hauts faits sont conservés.',
         '',
