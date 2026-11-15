@@ -25,6 +25,7 @@
 
     document.getElementById('duck').addEventListener('click', () => Engine.shootDuck());
     document.getElementById('dog').addEventListener('click', () => Engine.petDog());
+    document.getElementById('version-reload').addEventListener('click', () => location.reload());
     document.getElementById('url-post').addEventListener('click', () => Engine.postUrl());
     document.getElementById('url-shuffle').addEventListener('click', () => Engine.shuffleUrl());
     document.getElementById('rip-post').addEventListener('click', () => Engine.postRip());
@@ -157,6 +158,7 @@
   CC.UI.init();
   CC.Engine.init();
   bind();
+  CC.VersionCheck.start();
 
   // Small accessibility/e2e hook for manual testing in a browser console.
   window.coincoin = CC;

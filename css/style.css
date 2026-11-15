@@ -74,6 +74,30 @@ code { font: inherit; }
 .top-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .version-note { color: var(--muted); font-size: 10px; padding: 0 17px 12px; }
 
+/* ---------- deployed-version banner ---------- */
+.version-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  background: #3a311b;
+  border-bottom: 1px solid #8d7345;
+  color: #ffe6a1;
+  font-size: 11px;
+  font-weight: 700;
+}
+.version-banner button {
+  background: #4c3f1f;
+  border: 1px solid #a98a4b;
+  border-radius: var(--radius);
+  color: #ffe6a1;
+  padding: 4px 9px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.version-banner button:hover { background: #635326; }
+
 /* ---------- heading ---------- */
 .heading {
   padding: 20px 21px 18px;

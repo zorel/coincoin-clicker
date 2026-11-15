@@ -3,6 +3,9 @@
 (function (CC) {
   'use strict';
 
+  // Updated by scripts/stamp-version.mjs. Must match version.json.
+  CC.APP_VERSION = '2026-11-15T22:46:36.374Z';
+
   CC.SOURCES = {
     informatique: { label: '@informatique', short: 'informatique', icon: '🧠' },
     multidesk: { label: '@multidesk', short: 'multidesk', icon: '💿' },
@@ -11,6 +14,9 @@
 
   // Version ladder based on the real wmCoinCoin history, capped at the
   // latest upstream version (2.6.5). Never invent a 2.6.6 or a 3.0.
+  // Early needs keep the historical ~4-5× run curve. The last six updates
+  // unlock the new fritures and scale ~×12 per step, matching their cost
+  // curve, so buffs and permanent multipliers cannot rush the endgame.
   CC.VERSIONS = [
     { v: '0.1', title: 'alpha textuelle', need: 0, note: 'Fenêtre brute. Aucune fioriture, comme en 2001.' },
     { v: '1.0', title: 'la 1.0', need: 1500, note: 'Barre de titre et diodes du dock Window Maker.' },
@@ -18,12 +24,12 @@
     { v: '2.1beta', title: 'troll-o-scope', need: 40000, note: 'Le troll-o-scope couleur multiprecision arrive.' },
     { v: '2.2beta', title: 'sans libwraster', need: 180000, note: 'Ombres, diodes et applet allégée.' },
     { v: '2.3.5', title: 'nhorloges', need: 800000, note: 'Dégradés, mise en page stable, interface qui respire.' },
-    { v: '2.4.2a', title: 'balltrap', need: 3500000, note: 'Transitions douces. Les canards tremblent.' },
-    { v: '2.5.0-a', title: 'XMLCoinCoin', need: 15000000, note: 'Cartes de friture, typographie et parser respectable.' },
-    { v: '2.5.1-a', title: 'antibloub', need: 70000000, note: 'Antibloub : le palmipède signale les URLs déjà postées.' },
-    { v: '2.6.0', title: 'UTF-8', need: 350000000, note: 'Gouttières, respiration, finition premium.' },
-    { v: '2.6.1', title: 'la version Debian', need: 1800000000, note: 'Version réelle packagée. Presque gcoincoin.' },
-    { v: '2.6.5', title: 'dernière version réelle', need: 9000000000, note: 'Tout est poli. gcoincoin reste introuvable.' },
+    { v: '2.4.2a', title: 'balltrap', need: 10000000, note: 'Transitions douces. Les canards tremblent.' },
+    { v: '2.5.0-a', title: 'XMLCoinCoin', need: 120000000, note: 'Cartes de friture, typographie et parser respectable.' },
+    { v: '2.5.1-a', title: 'antibloub', need: 1500000000, note: 'Antibloub : le palmipède signale les URLs déjà postées.' },
+    { v: '2.6.0', title: 'UTF-8', need: 18000000000, note: 'Gouttières, respiration, finition premium.' },
+    { v: '2.6.1', title: 'la version Debian', need: 220000000000, note: 'Version réelle packagée. Presque gcoincoin.' },
+    { v: '2.6.5', title: 'dernière version réelle', need: 2600000000000, note: 'Tout est poli. gcoincoin reste introuvable.' },
   ];
 
   // Prices and base CPS are derived from Cookie Clicker's own balance curves
@@ -108,8 +114,8 @@
       minRebirth: 8,
     },
     {
-      id: 'ipot', icon: '✍️', name: 'Post par ipot', cost: 4.3e19, cps: 3.1e12,
-      desc: 'ipot poste à votre place. Il ne lit pas, mais il poste vite. Personne ne clique.',
+      id: 'ipot', icon: '🕰️', name: 'ipover time', cost: 4.3e19, cps: 3.1e12,
+      desc: 'ipot, c’est IP over Time : les paquets remontent le temps pour poster avant tout le monde. Latence négative, PREUMS rétroactif.',
       minRebirth: 9,
     },
     {
